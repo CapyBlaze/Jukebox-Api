@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Group {
+  code     String  @id @unique
+  maxUsers Int     @default(10)
+  provider String  @default("youtube")
+  queue    Queue[]
+  votes    Vote[]
+
+  adminId   Int  @unique
+  adminUser User @relation("GroupAdmin", fields: [adminId], references: [id], onDelete: Cascade)
+
+  members User[] @relation("GroupMembers")
+}
+
+model Vote {
+  id       Int      @id @default(autoincrement())
+  title    String
+  url      String
+  userId   Int
+  downVote Int      @default(0)
+  upVote   Int      @default(0)
+  endDate  DateTime
+
+  groupId String
+  group   Group? @relation(fields: [groupId], references: [code])
+}
+
+model Queue {
+  id    Int    @id @default(autoincrement())
+  title String
+  url   String
+
+  groupId String
+  group   Group  @relation(fields: [groupId], references: [code], onDelete: Cascade)
+
+  userId  Int
+  addedBy User @relation(fields: [userId], references: [id])
+
+  addedAt DateTime @default(now())
+}
+
+model User {
+  id     Int    @id @default(autoincrement())
+  pseudo String
+  token  String @unique
+
+  groupId String
+  group   Group? @relation("GroupMembers", fields: [groupId], references: [code], onDelete: Cascade)
+
+  managedGroup Group? @relation("GroupAdmin")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  queue     Queue[]
+
+  @@unique([pseudo, groupId])
+}
+
+model IpBan {
+  id        String   @id @default(cuid())
+  ipAddress String   @unique
+  bannedAt  DateTime @default(now())
+}
+
+model ApiUsage {
+  id        String   @id @default(cuid())
+  provider  String
+  startDate DateTime
+  endDate   DateTime
+  used      Int      @default(0)
+  lastUsed  DateTime @default(now())
+
+  @@unique([provider, startDate, endDate])
+}
+
+model SearchCache {
+  id        String   @id @default(cuid())
+  provider  String
+  query     String
+  results   Json
+  createdAt DateTime @default(now())
+
+  @@unique([provider, query])
+}

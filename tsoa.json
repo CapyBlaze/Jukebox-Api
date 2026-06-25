@@ -1,0 +1,32 @@
+{
+    "entryFile": "src/app.ts",
+    "noImplicitAdditionalProperties": "throw-on-extras",
+    "controllerPathGlobs": ["src/controllers/**/*.controller.ts"],
+    "spec": {
+        "outputDirectory": ".",
+        "specVersion": 3,
+        "name": "Jukebox API",
+        "title": "Jukebox API",
+        "description": "Create a group with friends, add your music, vote in real time to choose the next song, and listen to it together!",
+        "version": "1.0.0",
+        "contact": {
+            "name": "CapyBlaze",
+            "email": "capyblaze@gmail.com"
+        },
+        "servers": ["jukebox.capyblaze.hackclub.app"],
+        "securityDefinitions": {
+            "playerAuth": {
+                "type": "http",
+                "scheme": "bearer"
+            },
+            "adminAuth": {
+                "type": "http",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "routes": {
+        "routesDir": "src/generated",
+        "authenticationModule": "src/middlewares/auth.middleware.ts"
+    }
+}
