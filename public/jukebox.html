@@ -1,0 +1,85 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Jukebox</title>
+        <style>
+            body {
+                margin: 0;
+                background: #111;
+                color: #eee;
+                font-family: system-ui;
+            }
+            #info {
+                text-align: center;
+                padding: 2rem;
+            }
+            #player {
+                display: none;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="info">
+            <h2 id="title">Connexion au jukebox…</h2>
+        </div>
+        <div id="player"></div>
+
+        <script src="https://www.youtube.com/iframe_api"></script>
+        <script>
+            let player;
+            let playerReady = false;
+            let lastVideoId = null;
+
+            function onYouTubeIframeAPIReady() {
+                player = new YT.Player("player", {
+                    height: "0",
+                    width: "0",
+                    playerVars: { origin: window.location.origin },
+                    events: {
+                        onReady: () => {
+                            playerReady = true;
+                            poll();
+                            setInterval(poll, 3000);
+                        },
+                        onStateChange: onPlayerStateChange,
+                    },
+                });
+            }
+
+            async function poll() {
+                if (!playerReady) return; // sécurité supplémentaire
+
+                try {
+                    const res = await fetch(`/jukebox/${streamToken}/now-playing`);
+                    if (!res.ok) {
+                        document.getElementById("title").textContent = "Lien invalide ou expiré";
+                        return;
+                    }
+
+                    const { data } = await res.json();
+                    if (!data) {
+                        document.getElementById("title").textContent = "Aucune piste en cours";
+                        return;
+                    }
+
+                    document.getElementById("title").textContent = data.title;
+                    const elapsed = (Date.now() - new Date(data.startedAt).getTime()) / 1000;
+
+                    if (data.videoId !== lastVideoId) {
+                        lastVideoId = data.videoId;
+                        player.loadVideoById(data.videoId, elapsed);
+                    } else {
+                        const drift = Math.abs(player.getCurrentTime() - elapsed);
+                        if (drift > 2) player.seekTo(elapsed, true);
+                    }
+
+                    data.isPlaying ? player.playVideo() : player.pauseVideo();
+                } catch (e) {
+                    console.error("Sync error", e);
+                }
+            }
+
+            function onPlayerStateChange(event) {}
+        </script>
+    </body>
+</html>
