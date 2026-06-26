@@ -37,9 +37,10 @@ model Vote {
 }
 
 model Music {
-  id    Int    @id @default(autoincrement())
-  title String
-  url   String
+  id          Int    @id @default(autoincrement())
+  title       String
+  provider    String
+  providerKey String
 
   groupId String
   group   Group  @relation(fields: [groupId], references: [code], onDelete: Cascade)

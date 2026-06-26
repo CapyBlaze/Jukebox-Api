@@ -24,6 +24,7 @@ app.use(RateLimit.globalLimiter);
 app.use("/group/create", RateLimit.groupLimiter);
 app.use("/group/{groupId}/join", RateLimit.joinLimiter);
 app.use("/search", RateLimit.searchLimiter);
+app.use("/jukebox", RateLimit.jukeboxLimiter);
 app.use("/admin/login", RateLimit.adminLimiter);
 
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));

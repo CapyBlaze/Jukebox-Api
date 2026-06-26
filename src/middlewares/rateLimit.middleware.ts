@@ -11,6 +11,10 @@ export const globalLimiter = rateLimit({
     legacyHeaders: false,
     validate: { trustProxy },
 
+    skip: (req) => {
+        return req.originalUrl.startsWith("/jukebox/");
+    },
+
     handler: (_req, res, _next, options) => {
         return res
             .status(options.statusCode)
@@ -83,6 +87,25 @@ export const searchLimiter = rateLimit({
 export const adminLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 5, // Max 5 requests per IP
+    standardHeaders: "draft-7",
+    legacyHeaders: false,
+    validate: { trustProxy },
+
+    handler: (_req, res, _next, options) => {
+        return res
+            .status(options.statusCode)
+            .json(
+                ApiResponse.error(
+                    "Too Many Requests",
+                    "You have exceeded the limit of allowed requests. Please try again later."
+                )
+            );
+    },
+});
+
+export const jukeboxLimiter = rateLimit({
+    windowMs: 60 * 1000, // 1 minute
+    max: 60, // Max 60 requests per IP
     standardHeaders: "draft-7",
     legacyHeaders: false,
     validate: { trustProxy },

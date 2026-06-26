@@ -7,7 +7,8 @@ import { ApiResponse, type ApiResponseFormat } from "../utils/apiResponse.js";
 
 interface AddToQueueBody {
     title: string;
-    url: string;
+    provider: string;
+    providerKey: string;
 }
 
 @Route("group/queue")
@@ -36,9 +37,9 @@ export class QueueController extends Controller {
         @Request() req: AuthenticatedRequest
     ): Promise<ApiResponseFormat> {
         const user = req.user;
-        const { title, url } = body;
+        const { title, provider, providerKey } = body;
 
-        const addedMusic = await QueueService.addToQueue(user.groupId, user.id, title, url);
+        const addedMusic = await QueueService.addToQueue(user.groupId, user.id, title, provider, providerKey);
         return ApiResponse.success("Music added to queue", addedMusic);
     }
 

@@ -19,13 +19,15 @@ export async function addToQueue(
     groupId: string,
     userId: number,
     title: string,
-    url: string
+    provider: string,
+    providerKey: string
 ): Promise<Music> {
     const addedMusic = await prisma.music.create({
         data: {
             groupId,
             title,
-            url,
+            provider,
+            providerKey,
             userId,
         },
     });
@@ -90,6 +92,7 @@ export async function play(groupId: string): Promise<Music | null> {
         },
         data: {
             currentTrackId: queue[currentTrackIndex + 1]?.id || null,
+            playbackStartedAt: new Date(),
             isPlaying: true,
         },
     });
@@ -138,6 +141,7 @@ export async function skip(groupId: string): Promise<Music | null> {
                 code: groupId,
             },
             data: {
+                playbackStartedAt: group.isPlaying ? new Date() : null,
                 currentTrackId: queue[currentTrackIndex + 1]?.id || null,
             },
         });
