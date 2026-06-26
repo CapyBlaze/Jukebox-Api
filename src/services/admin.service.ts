@@ -1,3 +1,5 @@
+import type { IpBan } from "@prisma/client";
+
 import { HttpError } from "../middlewares/error.middleware.js";
 import { prisma } from "../prisma.js";
 
@@ -9,7 +11,9 @@ export const adminSessions = new Map<
     }
 >();
 
-export async function login(username: string, password: string) {
+type token = `${string}-${string}-${string}-${string}-${string}`;
+
+export async function login(username: string, password: string): Promise<token> {
     const usernameEnv = process.env.ADMIN_USERNAME || "admin";
     const passwordEnv = process.env.ADMIN_PASSWORD || crypto.randomUUID();
 
@@ -27,7 +31,7 @@ export async function login(username: string, password: string) {
     return token;
 }
 
-export async function ipBanned(ipAddress: string) {
+export async function ipBanned(ipAddress: string): Promise<IpBan> {
     return await prisma.ipBan.create({
         data: {
             ipAddress,
@@ -35,7 +39,7 @@ export async function ipBanned(ipAddress: string) {
     });
 }
 
-export async function ipUnbanned(ipAddress: string) {
+export async function ipUnbanned(ipAddress: string): Promise<IpBan> {
     return await prisma.ipBan.delete({
         where: {
             ipAddress,
@@ -43,11 +47,20 @@ export async function ipUnbanned(ipAddress: string) {
     });
 }
 
-export async function getBannedIps() {
+export async function getBannedIps(): Promise<IpBan[]> {
     return await prisma.ipBan.findMany({
         select: {
+            id: true,
             ipAddress: true,
             bannedAt: true,
         },
     });
+}
+
+export async function countGroups(): Promise<number> {
+    return await prisma.group.count();
+}
+
+export async function countUsers(): Promise<number> {
+    return await prisma.user.count();
 }

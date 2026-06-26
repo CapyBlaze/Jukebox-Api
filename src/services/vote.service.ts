@@ -1,4 +1,4 @@
-import type { User } from "@prisma/client";
+import type { User, Vote } from "@prisma/client";
 
 import { prisma } from "../prisma.js";
 
@@ -8,7 +8,7 @@ export async function create(
     title: string,
     url: string,
     timeoutSec: number = 3 * 60
-) {
+): Promise<Vote> {
     return await prisma.vote.create({
         data: {
             title,
@@ -20,7 +20,7 @@ export async function create(
     });
 }
 
-export async function deleteVote(groupId: string, voteId: number) {
+export async function deleteVote(groupId: string, voteId: number): Promise<Vote> {
     return await prisma.vote.delete({
         where: {
             id: voteId,
@@ -29,7 +29,12 @@ export async function deleteVote(groupId: string, voteId: number) {
     });
 }
 
-export async function vote(groupId: string, voteId: number, userId: number, isUpvote: boolean) {
+export async function vote(
+    groupId: string,
+    voteId: number,
+    userId: number,
+    isUpvote: boolean
+): Promise<Vote> {
     return await prisma.vote.update({
         where: {
             id: voteId,
@@ -43,7 +48,7 @@ export async function vote(groupId: string, voteId: number, userId: number, isUp
     });
 }
 
-export async function get(groupId: string, voteId: number) {
+export async function get(groupId: string, voteId: number): Promise<Vote | null> {
     return await prisma.vote.findUnique({
         where: {
             id: voteId,

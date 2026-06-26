@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Path, Post, Request, Route, Security, Tags } from "tsoa";
 
+import { SecurityRole } from "../middlewares/auth.middleware.js";
 import * as VoteService from "../services/vote.service.js";
 import type { AuthenticatedAdminRequest, AuthenticatedRequest } from "../types/express.js";
 import { ApiResponse, type ApiResponseFormat } from "../utils/apiResponse.js";
@@ -18,7 +19,7 @@ interface VoteBody {
 @Tags("Vote")
 export class VoteController extends Controller {
     @Get("{voteId}")
-    @Security("adminGroupAuth")
+    @Security(SecurityRole.UserGroup)
     public async get(
         @Path() voteId: number,
         @Request() req: AuthenticatedAdminRequest
@@ -31,7 +32,7 @@ export class VoteController extends Controller {
     }
 
     @Post("create")
-    @Security("adminGroupAuth")
+    @Security(SecurityRole.AdminGroup)
     public async create(
         @Request() req: AuthenticatedAdminRequest,
         @Body() body: CreateVoteBody
@@ -45,7 +46,7 @@ export class VoteController extends Controller {
     }
 
     @Delete("{voteId}")
-    @Security("adminGroupAuth")
+    @Security(SecurityRole.AdminGroup)
     public async delete(
         @Path() voteId: number,
         @Request() req: AuthenticatedAdminRequest
@@ -58,7 +59,7 @@ export class VoteController extends Controller {
     }
 
     @Post("{voteId}/vote")
-    @Security("userGroupAuth")
+    @Security(SecurityRole.UserGroup)
     public async vote(
         @Path() voteId: number,
         @Body() body: VoteBody,

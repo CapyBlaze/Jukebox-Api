@@ -1,7 +1,13 @@
 import { prisma } from "../prisma.js";
 import { generateGroupCode } from "../utils/generatedCode.js";
 
-export async function create() {
+type token = `${string}-${string}-${string}-${string}-${string}`;
+
+export async function create(): Promise<{
+    code: string;
+    maxUsers: number;
+    adminToken: string;
+}> {
     let code = "";
     let groupExists = true;
 
@@ -15,34 +21,40 @@ export async function create() {
 
     const adminToken = crypto.randomUUID();
 
-    const newGroup = await prisma.group.create({
-        data: {
-            code: code,
-            adminUser: {
-                create: {
-                    pseudo: "Host",
-                    token: adminToken,
-                },
-            },
-            members: {
-                connect: {
-                    token: adminToken,
-                },
-            },
-        },
-        include: {
-            adminUser: true,
-        },
-    });
+    return await prisma.$transaction(async (tx) => {
+        const newGroup = await tx.group.create({
+            data: { code },
+        });
 
-    return {
-        code: newGroup.code,
-        maxUsers: newGroup.maxUsers,
-        adminToken: adminToken,
-    };
+        const adminUser = await tx.user.create({
+            data: {
+                pseudo: "Host",
+                token: adminToken,
+                groupId: newGroup.code,
+            },
+        });
+
+        await tx.group.update({
+            where: { code },
+            data: {
+                adminId: adminUser.id,
+                members: {
+                    connect: {
+                        id: adminUser.id,
+                    },
+                },
+            },
+        });
+
+        return {
+            code: newGroup.code,
+            maxUsers: newGroup.maxUsers,
+            adminToken: adminToken,
+        };
+    });
 }
 
-export async function join(groupId: string, pseudo: string) {
+export async function join(groupId: string, pseudo: string): Promise<token> {
     const group = await prisma.group.findUnique({
         where: { code: groupId },
         include: {
@@ -72,12 +84,15 @@ export async function join(groupId: string, pseudo: string) {
     return token;
 }
 
-export async function info(groupId: string) {
+export async function info(groupId: string): Promise<{
+    code: string;
+    numberOfUsers: number;
+    maxUsers: number;
+    members: { pseudo: string }[];
+}> {
     const group = await prisma.group.findUnique({
         where: { code: groupId },
         include: {
-            code: true,
-            maxUsers: true,
             members: true,
         },
     });
@@ -94,31 +109,60 @@ export async function info(groupId: string) {
     };
 }
 
-export async function leave(userId: number) {
-    const user = await prisma.user.findUnique({
+export async function leave(userId: number): Promise<{
+    pseudo: string;
+    createdAt: Date;
+    updatedAt: Date;
+    groupId: string;
+}> {
+    const userFind = await prisma.user.findUnique({
         where: { id: userId },
     });
 
-    if (!user) throw new Error("User not found");
+    if (!userFind) throw new Error("User not found");
 
-    return await prisma.user.delete({
+    const user = await prisma.user.delete({
         where: { id: userId },
     });
+
+    return {
+        pseudo: user.pseudo,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+        groupId: user.groupId,
+    };
 }
 
-export async function setProvider(userId: number, provider: "youtube") {
-    const user = await prisma.user.findUnique({
-        where: { id: userId },
-        include: {
-            group: true,
-        },
-    });
-
-    if (!user) throw new Error("User not found");
-    if (!user.group) throw new Error("User is not in a group");
-
-    return await prisma.group.update({
-        where: { code: user.group.code },
+export async function setProvider(groupId: string, provider: "youtube") {
+    const group = await prisma.group.update({
+        where: { code: groupId },
         data: { provider },
     });
+
+    return {
+        code: group.code,
+        provider: group.provider,
+        isPlaying: group.isPlaying,
+    };
+}
+
+export async function rotateStreamToken(groupId: string): Promise<string | null> {
+    const newStreamToken = crypto.randomUUID();
+    await prisma.group.update({
+        where: { code: groupId },
+        data: { streamToken: newStreamToken },
+    });
+
+    return newStreamToken;
+}
+
+export async function jukeboxToken(groupId: string): Promise<string | null> {
+    const group = await prisma.group.findUnique({
+        where: { code: groupId },
+        select: { streamToken: true },
+    });
+
+    if (!group) return null;
+
+    return group.streamToken;
 }

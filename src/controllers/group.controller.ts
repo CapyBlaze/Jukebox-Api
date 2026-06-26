@@ -12,6 +12,7 @@ import {
     Tags,
 } from "tsoa";
 
+import { SecurityRole } from "../middlewares/auth.middleware.js";
 import * as GroupService from "../services/group.service.js";
 import type { AuthenticatedAdminRequest, AuthenticatedRequest } from "../types/express.js";
 import { ApiResponse, type ApiResponseFormat } from "../utils/apiResponse.js";
@@ -52,7 +53,7 @@ export class GroupController extends Controller {
     }
 
     @Get("")
-    @Security("userGroupAuth")
+    @Security(SecurityRole.UserGroup)
     public async listUsers(@Request() req: AuthenticatedRequest): Promise<ApiResponseFormat> {
         const user = req.user;
         const group = await GroupService.info(user.groupId);
@@ -61,7 +62,7 @@ export class GroupController extends Controller {
     }
 
     @Delete("leave")
-    @Security("userGroupAuth")
+    @Security(SecurityRole.UserGroup)
     public async leaveGroup(@Request() req: AuthenticatedRequest): Promise<ApiResponseFormat> {
         const user = req.user;
 
@@ -74,16 +75,45 @@ export class GroupController extends Controller {
     }
 
     @Patch("provider")
-    @Security("adminGroupAuth")
+    @Security(SecurityRole.AdminGroup)
     public async setProvider(
         @Request() req: AuthenticatedAdminRequest,
         @Body() body: SetProviderBody
     ): Promise<ApiResponseFormat> {
-        const user = req.user;
+        const groupId = req.user.managedGroup.code;
         const { provider } = body;
 
-        const result = await GroupService.setProvider(user.id, provider);
+        const result = await GroupService.setProvider(groupId, provider);
 
         return ApiResponse.success("Provider set", result);
+    }
+
+    @Get("jukebox/token")
+    @Security(SecurityRole.AdminGroup)
+    public async getStreamToken(@Request() req: AuthenticatedAdminRequest): Promise<ApiResponseFormat> {
+        const groupId = req.user.managedGroup.code;
+        const streamToken = await GroupService.jukeboxToken(groupId);
+
+        if (!streamToken) {
+            this.setStatus(404);
+            return ApiResponse.error("Stream token not found", "No stream token available for the specified group");
+        }
+
+        return ApiResponse.success("Stream token retrieved", {
+            streamToken,
+        });
+    }
+
+    @Patch("jukebox/rotate")
+    @Security(SecurityRole.AdminGroup)
+    public async rotateStreamToken(
+        @Request() req: AuthenticatedAdminRequest,
+    ): Promise<ApiResponseFormat> {
+        const groupId = req.user.managedGroup.code;
+        const newToken = await GroupService.rotateStreamToken(groupId);
+
+        return ApiResponse.success("Stream token rotated successfully", {
+            newStreamToken: newToken,
+        });
     }
 }

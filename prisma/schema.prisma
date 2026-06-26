@@ -10,13 +10,17 @@ model Group {
   code     String  @id @unique
   maxUsers Int     @default(10)
   provider String  @default("youtube")
-  queue    Queue[]
+  queue    Music[]
   votes    Vote[]
 
-  adminId   Int  @unique
-  adminUser User @relation("GroupAdmin", fields: [adminId], references: [id], onDelete: Cascade)
+  isPlaying         Boolean   @default(false)
+  currentTrackId    Int?
+  playbackStartedAt DateTime?
+  streamToken       String    @unique @default(uuid())
 
-  members User[] @relation("GroupMembers")
+  adminId   Int?   @unique
+  adminUser User?  @relation("GroupAdmin", fields: [adminId], references: [id], onDelete: Cascade)
+  members   User[] @relation("GroupMembers")
 }
 
 model Vote {
@@ -32,7 +36,7 @@ model Vote {
   group   Group? @relation(fields: [groupId], references: [code])
 }
 
-model Queue {
+model Music {
   id    Int    @id @default(autoincrement())
   title String
   url   String
@@ -58,7 +62,7 @@ model User {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  queue     Queue[]
+  queue     Music[]
 
   @@unique([pseudo, groupId])
 }

@@ -9,11 +9,8 @@ import { ipBannedHandler } from "./middlewares/ipBanned.middleware.js";
 import { loggerHandler } from "./middlewares/logger.middleware.js";
 import { notFoundHandler } from "./middlewares/notFound.middleware.js";
 import * as RateLimit from "./middlewares/rateLimit.middleware.js";
-import { bootstrap } from "./start/bootstrap.js";
 
 dotenv.config({ quiet: true });
-
-await bootstrap();
 
 const app = express();
 app.set("trust proxy", 1);

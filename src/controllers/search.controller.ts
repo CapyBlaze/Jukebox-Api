@@ -1,5 +1,6 @@
 import { Controller, Get, Query, Route, Security, Tags } from "tsoa";
 
+import { SecurityRole } from "../middlewares/auth.middleware.js";
 import * as SearchService from "../services/search.service.js";
 import { ApiResponse, type ApiResponseFormat } from "../utils/apiResponse.js";
 
@@ -7,7 +8,7 @@ import { ApiResponse, type ApiResponseFormat } from "../utils/apiResponse.js";
 @Tags("Search")
 export class SearchController extends Controller {
     @Get("")
-    @Security("userGroupAuth")
+    @Security(SecurityRole.UserGroup)
     public async search(@Query("q") query?: string): Promise<ApiResponseFormat> {
         if (!query) {
             this.setStatus(400);
