@@ -1,6 +1,8 @@
 import dotenv from "dotenv";
 import express from "express";
+import path from "path";
 import swaggerUi from "swagger-ui-express";
+import { fileURLToPath } from "url";
 
 import swaggerDocument from "../swagger.json" with { type: "json" };
 import { RegisterRoutes } from "./generated/routes.js";
@@ -11,6 +13,8 @@ import { notFoundHandler } from "./middlewares/notFound.middleware.js";
 import * as RateLimit from "./middlewares/rateLimit.middleware.js";
 
 dotenv.config({ quiet: true });
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 app.set("trust proxy", 1);
@@ -28,6 +32,7 @@ app.use("/jukebox", RateLimit.jukeboxLimiter);
 app.use("/admin/login", RateLimit.adminLimiter);
 
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use(express.static(path.join(__dirname, "..", "public")));
 RegisterRoutes(app);
 
 app.use(notFoundHandler);
