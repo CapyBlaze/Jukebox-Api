@@ -53,7 +53,7 @@ jobs:
           script: |
             set -e
 
-            cd /root/DuckCorp-Api
+            cd /root/Jukebox-Api
 
             git fetch origin main
             git reset --hard HEAD
@@ -63,10 +63,10 @@ jobs:
             npm run build
             npx prisma migrate deploy
 
-            systemctl restart duckcorp_api
+            systemctl restart jukebox_api
 
             for i in {1..10}; do
-              if curl -sf http://localhost:8080/system/health; then
+              if curl -sf http://localhost:8085/system/health; then
                 echo "API OK"
                 break
               fi
