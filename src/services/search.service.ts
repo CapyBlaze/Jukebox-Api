@@ -1,7 +1,9 @@
 import { z } from "zod";
 
+import { config } from "../config/config.js";
 import { prisma } from "../prisma.js";
 import { parseIsoDuration } from "../utils/parseIsoDuration.js";
+import * as CacheService from "./cache.service.js";
 
 const API_KEY = process.env.YOUTUBE_API_KEY;
 
@@ -83,7 +85,7 @@ export async function searchYouTube(query: string): Promise<YouTubeSearchResult[
         },
     });
 
-    if (usage && usage.used >= 10000) {
+    if (usage && usage.used >= config.data.apiLimitDay.youtube) {
         throw new Error("YouTube API usage limit reached for today");
     }
 
@@ -139,6 +141,8 @@ export async function searchYouTube(query: string): Promise<YouTubeSearchResult[
         },
     });
 
+    await CacheService.cleanupSearchCache();
+
     return data.items;
 }
 
@@ -166,7 +170,7 @@ export async function durationYoutube(videoId: string): Promise<number | null> {
         },
     });
 
-    if (usage && usage.used >= 10000) {
+    if (usage && usage.used >= config.data.apiLimitDay.youtube) {
         throw new Error("YouTube API usage limit reached for today");
     }
 
@@ -220,6 +224,8 @@ export async function durationYoutube(videoId: string): Promise<number | null> {
             durationSec,
         },
     });
+
+    await CacheService.cleanupMetadataCache();
 
     return durationSec;
 }

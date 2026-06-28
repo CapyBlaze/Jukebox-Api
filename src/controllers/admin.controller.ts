@@ -1,10 +1,11 @@
 import os from "os";
 import systeminformation from "systeminformation";
-import { Body, Controller, Get, Post, Route, Security, Tags } from "tsoa";
+import { Body, Controller, Delete, Get, Patch, Post, Route, Security, Tags } from "tsoa";
 
 import { SecurityRole } from "../middlewares/auth.middleware.js";
 import * as AdminService from "../services/admin.service.js";
 import { ApiResponse, type ApiResponseFormat } from "../utils/apiResponse.js";
+import { config } from "../config/config.js";
 
 interface RegisterAdminBody {
     username: string;
@@ -13,6 +14,15 @@ interface RegisterAdminBody {
 
 interface IPBanBody {
     ipAddress: string;
+}
+
+interface UpdateApiLimitBody {
+    youtubeLimit: number;
+}
+
+interface UpdateCacheSizeBody {
+    searchCacheLineSize?: number; 
+    metadataCacheLineSize?: number;
 }
 
 @Route("admin")
@@ -68,6 +78,60 @@ export class AdminController extends Controller {
         return ApiResponse.success("IP unbanned", {
             ipAddress: body.ipAddress,
         });
+    }
+
+    @Patch("api/limit")
+    @Security(SecurityRole.Admin)
+    public async updateApiLimit(@Body() body: UpdateApiLimitBody): Promise<ApiResponseFormat> {
+        const { youtubeLimit } = body;
+
+        if (youtubeLimit === undefined || youtubeLimit < 0) {
+            this.setStatus(400);
+            return ApiResponse.error("Invalid input", "YouTube API limit must be a non-negative number");
+        }
+
+        config.data.apiLimitDay.youtube = youtubeLimit;
+        await config.save();
+
+        return ApiResponse.success("YouTube API limit updated", {
+            youtubeLimit: youtubeLimit,
+        });
+    }
+
+    @Patch("cache/size")
+    @Security(SecurityRole.Admin)
+    public async updateCacheSize(@Body() body: UpdateCacheSizeBody): Promise<ApiResponseFormat> {
+        const { searchCacheLineSize, metadataCacheLineSize } = body;
+
+        if (searchCacheLineSize !== undefined) {
+            if (searchCacheLineSize < 0) {
+                this.setStatus(400);
+                return ApiResponse.error("Invalid input", "Search cache line size must be a non-negative number");
+            }
+        }
+
+        if (metadataCacheLineSize !== undefined) {
+            if (metadataCacheLineSize < 0) {
+                this.setStatus(400);
+                return ApiResponse.error("Invalid input", "Metadata cache line size must be a non-negative number");
+            }
+        }
+
+        config.data.maxCacheLine.search = searchCacheLineSize ?? config.data.maxCacheLine.search;
+        config.data.maxCacheLine.metadata = metadataCacheLineSize ?? config.data.maxCacheLine.metadata;
+        await config.save();
+
+        return ApiResponse.success("Cache sizes updated", {
+            searchCacheLineSize: searchCacheLineSize,
+            metadataCacheLineSize: metadataCacheLineSize,
+        });
+    }
+
+    @Delete("cache/clear")
+    @Security(SecurityRole.Admin)
+    public async clearCache(): Promise<ApiResponseFormat> {
+        await AdminService.clearCache();
+        return ApiResponse.success("Cache cleared");
     }
 
     @Get("stats")

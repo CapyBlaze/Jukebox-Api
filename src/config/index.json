@@ -1,0 +1,9 @@
+{
+    "apiLimitDay": {
+        "youtube": 10000
+    },
+    "maxCacheLine": {
+        "search": 100,
+        "metadata": 100
+    }
+}

@@ -64,3 +64,8 @@ export async function countGroups(): Promise<number> {
 export async function countUsers(): Promise<number> {
     return await prisma.user.count();
 }
+
+export async function clearCache(): Promise<void> {
+    await prisma.searchCache.deleteMany({});
+    await prisma.metadataCache.deleteMany({});
+}
