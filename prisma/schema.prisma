@@ -41,6 +41,7 @@ model Music {
   title       String
   provider    String
   providerKey String
+  durationSec Int?
 
   groupId String
   group   Group  @relation(fields: [groupId], references: [code], onDelete: Cascade)
@@ -86,11 +87,19 @@ model ApiUsage {
 }
 
 model SearchCache {
-  id        String   @id @default(cuid())
   provider  String
   query     String
   results   Json
   createdAt DateTime @default(now())
 
-  @@unique([provider, query])
+  @@id([provider, query])
+}
+
+model MetadataCache {
+  provider    String
+  providerKey String
+  durationSec Int
+  fetchedAt   DateTime @default(now())
+
+  @@id([provider, providerKey])
 }

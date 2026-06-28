@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { prisma } from "../prisma.js";
+import { parseIsoDuration } from "../utils/parseIsoDuration.js";
 
 const API_KEY = process.env.YOUTUBE_API_KEY;
 
@@ -82,7 +83,7 @@ export async function searchYouTube(query: string): Promise<YouTubeSearchResult[
         },
     });
 
-    if (usage && usage.used >= 100) {
+    if (usage && usage.used >= 10000) {
         throw new Error("YouTube API usage limit reached for today");
     }
 
@@ -111,7 +112,7 @@ export async function searchYouTube(query: string): Promise<YouTubeSearchResult[
             },
         },
         update: {
-            used: { increment: 1 },
+            used: { increment: 100 },
         },
         create: {
             provider: "youtube",
@@ -139,4 +140,86 @@ export async function searchYouTube(query: string): Promise<YouTubeSearchResult[
     });
 
     return data.items;
+}
+
+export async function durationYoutube(videoId: string): Promise<number | null> {
+    const cache = await prisma.metadataCache.findUnique({
+        where: {
+            provider_providerKey: {
+                provider: "youtube",
+                providerKey: videoId,
+            },
+        },
+    });
+
+    if (cache) {
+        return cache.durationSec;
+    }
+
+    const usage = await prisma.apiUsage.findUnique({
+        where: {
+            provider_startDate_endDate: {
+                provider: "youtube",
+                startDate: new Date(new Date().setUTCHours(0, 0, 0, 0)),
+                endDate: new Date(new Date().setUTCHours(23, 59, 59, 999)),
+            },
+        },
+    });
+
+    if (usage && usage.used >= 10000) {
+        throw new Error("YouTube API usage limit reached for today");
+    }
+
+    const params = new URLSearchParams({
+        key: API_KEY!,
+        part: "contentDetails",
+        id: videoId,
+    });
+
+    const response = await fetch(`https://www.googleapis.com/youtube/v3/videos?${params}`);
+    if (!response.ok) return null;
+
+    await prisma.apiUsage.upsert({
+        where: {
+            provider_startDate_endDate: {
+                provider: "youtube",
+                startDate: new Date(new Date().setUTCHours(0, 0, 0, 0)),
+                endDate: new Date(new Date().setUTCHours(23, 59, 59, 999)),
+            },
+        },
+        update: {
+            used: { increment: 1 },
+        },
+        create: {
+            provider: "youtube",
+            startDate: new Date(new Date().setUTCHours(0, 0, 0, 0)),
+            endDate: new Date(new Date().setUTCHours(23, 59, 59, 999)),
+            used: 1,
+        },
+    });
+
+    const data = await response.json();
+    const iso = data.items?.[0]?.contentDetails?.duration;
+    if (!iso) return null;
+
+    const durationSec = parseIsoDuration(iso);
+
+    await prisma.metadataCache.upsert({
+        where: {
+            provider_providerKey: {
+                provider: "youtube",
+                providerKey: videoId,
+            },
+        },
+        update: {
+            durationSec,
+        },
+        create: {
+            provider: "youtube",
+            providerKey: videoId,
+            durationSec,
+        },
+    });
+
+    return durationSec;
 }

@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, Path, Post, Request, Route, Security, Ta
 
 import { SecurityRole } from "../middlewares/auth.middleware.js";
 import * as QueueService from "../services/queue.service.js";
+import * as SearchService from "../services/search.service.js";
 import type { AuthenticatedRequest } from "../types/express.js";
 import { ApiResponse, type ApiResponseFormat } from "../utils/apiResponse.js";
 
@@ -38,8 +39,9 @@ export class QueueController extends Controller {
     ): Promise<ApiResponseFormat> {
         const user = req.user;
         const { title, provider, providerKey } = body;
+        const durationSec = await SearchService.durationYoutube(providerKey);
 
-        const addedMusic = await QueueService.addToQueue(user.groupId, user.id, title, provider, providerKey);
+        const addedMusic = await QueueService.addToQueue(user.groupId, user.id, title, provider, providerKey, durationSec);
         return ApiResponse.success("Music added to queue", addedMusic);
     }
 

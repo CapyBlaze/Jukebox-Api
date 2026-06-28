@@ -20,7 +20,8 @@ export async function addToQueue(
     userId: number,
     title: string,
     provider: string,
-    providerKey: string
+    providerKey: string,
+    durationSec: number | null
 ): Promise<Music> {
     const addedMusic = await prisma.music.create({
         data: {
@@ -28,6 +29,7 @@ export async function addToQueue(
             title,
             provider,
             providerKey,
+            durationSec,
             userId,
         },
     });
@@ -46,7 +48,9 @@ export async function deleteFromQueue(groupId: string, musicId: number): Promise
     return deletedMusic;
 }
 
-export async function getCurrent(groupId: string): Promise<Music | null> {
+export async function getCurrent(
+    groupId: string
+): Promise<(Music & { startedAt: Date | null; isPlaying: boolean }) | null> {
     const group = await prisma.group.findUnique({
         where: { code: groupId },
     });
@@ -59,7 +63,13 @@ export async function getCurrent(groupId: string): Promise<Music | null> {
         },
     });
 
-    return currentTrack;
+    if (!currentTrack) return null;
+
+    return {
+        ...currentTrack,
+        startedAt: group.playbackStartedAt,
+        isPlaying: group.isPlaying,
+    };
 }
 
 export async function play(groupId: string): Promise<Music | null> {

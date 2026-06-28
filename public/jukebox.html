@@ -62,6 +62,12 @@
                     0 0 35px rgba(225, 98, 126, 0.4);
             }
 
+            .sillon {
+                fill: none;
+                stroke: rgba(255, 255, 255, 0.04);
+                stroke-width: 0.5;
+            }
+
             .notes-container {
                 position: absolute;
                 height: 1px;
@@ -186,6 +192,11 @@
                 display: inline-block;
                 padding-left: 100%;
                 animation: defilement 15s linear infinite;
+            }
+
+            .cone-shine {
+                mix-blend-mode: screen;
+                opacity: 0.35;
             }
 
             @keyframes defilement {
@@ -502,7 +513,19 @@
                             fill="url(#paint4_linear_2446_2863)"
                         />
                     </g>
-                    <circle id="disqueblack" cx="183.998" cy="160" r="70" fill="#242428" />
+                    <circle
+                        id="disqueblack"
+                        cx="183.998"
+                        cy="160"
+                        r="70"
+                        fill="url(#reflet-vinyle)"
+                    />
+                    <circle cx="183.998" cy="160" r="65" class="sillon" />
+                    <circle cx="183.998" cy="160" r="60" class="sillon" />
+                    <circle cx="183.998" cy="160" r="55" class="sillon" />
+                    <circle cx="183.998" cy="160" r="50" class="sillon" />
+                    <circle cx="183.998" cy="160" r="45" class="sillon" />
+                    <circle cx="183.998" cy="160" r="40" class="sillon" />
                     <path
                         id="disque"
                         fill-rule="evenodd"
@@ -510,9 +533,35 @@
                         d="M219.998 160C219.998 140.118 203.88 124 183.998 124C164.116 124 147.998 140.118 147.998 160C147.998 179.882 164.116 196 183.998 196C203.88 196 219.998 179.882 219.998 160ZM189.998 160C189.998 156.686 187.312 154 183.998 154C180.684 154 177.998 156.686 177.998 160C177.998 163.314 180.684 166 183.998 166C187.312 166 189.998 163.314 189.998 160Z"
                         fill="url(#paint0_linear_2446_2863)"
                     />
+                    <g class="cone-shine" transform="rotate(60 184.002 159.992)">
+                        <path
+                            opacity="0.0"
+                            d="M184.002 229.992C222.662 229.992 254.002 198.652 254.002 159.992C254.002 121.332 222.662 89.9922 184.002 89.9922C145.342 89.9922 114.002 121.332 114.002 159.992C114.002 198.652 145.342 229.992 184.002 229.992Z"
+                            fill="white"
+                            fill-opacity="0.0"
+                        />
+                        <path
+                            opacity="0.0"
+                            d="M184.002 229.992C193.194 229.992 202.297 228.182 210.79 224.664C219.283 221.146 226.999 215.99 233.499 209.49L184.002 159.992L184.002 229.992Z"
+                            fill="white"
+                        />
+                        <path
+                            opacity="0.0"
+                            d="M184.002 89.9922C168.002 89.9922 152.485 95.4734 140.035 105.523L184.002 159.992V89.9922Z"
+                            fill="white"
+                        />
+                    </g>
                     <path
                         d="M183.998 154C187.312 154 189.998 156.686 189.998 160C189.998 163.314 187.312 166 183.998 166C180.684 166 177.998 163.314 177.998 160C177.998 156.686 180.684 154 183.998 154Z"
                         fill="white"
+                    />
+                    <circle
+                        cx="183.998"
+                        cy="160"
+                        r="6"
+                        fill="none"
+                        stroke="#dcdcdc"
+                        stroke-width="0.5"
                     />
                     <path
                         d="M7.5 168H22H71V156.5C71 155.329 71.0178 154.163 71.0532 153H22.2526H7.5C3.35786 153 0 156.358 0 160.5C0 164.642 3.35786 168 7.5 168Z"
@@ -576,6 +625,11 @@
                     />
                 </g>
                 <defs>
+                    <radialGradient id="reflet-vinyle" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stop-color="#3a3a40" />
+                        <stop offset="60%" stop-color="#1b1b1f" />
+                        <stop offset="100%" stop-color="#0f0f11" />
+                    </radialGradient>
                     <linearGradient
                         id="paint0_linear_2446_2863"
                         x1="147.998"
@@ -827,13 +881,15 @@
             }
 
             function playEffectNote() {
-                if (!reduceMotion) {
+                if (!running && !reduceMotion) {
                     intervalId = setInterval(spawnNote, 450);
+                    running = true;
                 }
             }
 
             function stopEffectNote() {
                 clearInterval(intervalId);
+                running = false;
             }
         </script>
         <script>
@@ -843,6 +899,9 @@
             let player;
             let playerReady = false;
             let lastVideoId = null;
+            let hasJoined = false;
+            let locallyPaused = false;
+            let currentServerElapsed = 0;
             let lastIsPlaying = false;
 
             function onYouTubeIframeAPIReady() {
@@ -933,8 +992,11 @@
                     }
 
                     document.getElementById("titleJukebox").textContent = data.title;
+
                     const serverElapsed = (Date.now() - new Date(data.startedAt).getTime()) / 1000;
                     const localElapsed = player.getCurrentTime();
+                    currentServerElapsed = serverElapsed;
+                    console.log(`Server elapsed: ${serverElapsed}, Local elapsed: ${localElapsed}`);
 
                     if (data.providerKey !== lastVideoId) {
                         lastVideoId = data.providerKey;
@@ -953,17 +1015,22 @@
                     }
 
                     if (data.isPlaying !== lastIsPlaying) {
-                        if (data.isPlaying) {
-                            player.playVideo();
-                            playEffectNote();
-                            document.getElementById("play-icon").style.display = "none";
-                            document.getElementById("pause-icon").style.display = "block";
-                        } else {
+                        if (!data.isPlaying) {
                             player.pauseVideo();
                             stopEffectNote();
+
                             document.getElementById("play-icon").style.display = "block";
                             document.getElementById("pause-icon").style.display = "none";
+                        } else {
+                            if (hasJoined && !locallyPaused) {
+                                player.playVideo();
+                                playEffectNote();
+
+                                document.getElementById("play-icon").style.display = "none";
+                                document.getElementById("pause-icon").style.display = "block";
+                            }
                         }
+
                         lastIsPlaying = data.isPlaying;
                     }
                 } catch (e) {
@@ -971,15 +1038,28 @@
                 }
             }
 
-            let isJoined = false;
-            document.getElementById("startButton").addEventListener("click", function () {
-                isJoined = true;
+            document.getElementById("startButton").addEventListener("click", () => {
+                hasJoined = true;
 
-                if (player) {
-                    player.playVideo();
-                    playEffectNote();
-                    document.getElementById("play-icon").style.display = "none";
-                    document.getElementById("pause-icon").style.display = "block";
+                if (player.getPlayerState() === YT.PlayerState.PLAYING) {
+                    locallyPaused = true;
+
+                    player.pauseVideo();
+                    stopEffectNote();
+
+                    document.getElementById("play-icon").style.display = "block";
+                    document.getElementById("pause-icon").style.display = "none";
+                } else {
+                    locallyPaused = false;
+
+                    if (lastIsPlaying) {
+                        player.seekTo(currentServerElapsed, true);
+                        player.playVideo();
+                        playEffectNote();
+
+                        document.getElementById("play-icon").style.display = "none";
+                        document.getElementById("pause-icon").style.display = "block";
+                    }
                 }
             });
         </script>
