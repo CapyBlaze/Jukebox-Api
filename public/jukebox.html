@@ -968,7 +968,7 @@
 
             function onPlayerStateChange(event) {
                 if (event.data === YT.PlayerState.BUFFERING) {
-                    console.log("Chargement en cours...");
+                    console.log("Loading...");
                     return;
                 }
             }
@@ -996,7 +996,6 @@
                     const serverElapsed = (Date.now() - new Date(data.startedAt).getTime()) / 1000;
                     const localElapsed = player.getCurrentTime();
                     currentServerElapsed = serverElapsed;
-                    console.log(`Server elapsed: ${serverElapsed}, Local elapsed: ${localElapsed}`);
 
                     if (data.providerKey !== lastVideoId) {
                         lastVideoId = data.providerKey;
@@ -1010,7 +1009,7 @@
                         const thumbnail = `https://img.youtube.com/vi/${data.providerKey}/mqdefault.jpg`;
                         document.getElementById("thumbnail").src = thumbnail;
                     } else if (Math.abs(localElapsed - serverElapsed) > OFFSET_TOLERANCE) {
-                        console.log("Recalage sur le serveur...");
+                        console.log("Resetting on the server...");
                         player.seekTo(serverElapsed, true);
                     }
 
