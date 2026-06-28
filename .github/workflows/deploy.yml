@@ -66,7 +66,7 @@ jobs:
             systemctl restart jukebox_api
 
             for i in {1..10}; do
-              if curl -sf http://localhost:8085/system/health; then
+              if curl -sf http://localhost:8085/system/health > /dev/null; then
                 echo "API OK"
                 break
               fi
@@ -75,3 +75,6 @@ jobs:
             done
 
             echo "Deploy successful"
+
+            sleep 1
+            exit 0
