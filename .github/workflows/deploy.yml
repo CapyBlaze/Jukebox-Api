@@ -65,14 +65,14 @@ jobs:
 
             systemctl restart jukebox_api > /dev/null 2>&1
 
-            # for i in {1..10}; do
-            #   if curl -sf http://localhost:8085/system/health > /dev/null; then
-            #     echo "API OK"
-            #     break
-            #   fi
-            #   echo "Waiting API... ($i)"
-            #   sleep 2
-            # done
+            for i in {1..10}; do
+              if curl -sf http://localhost:8085/system/health > /dev/null; then
+                echo "API OK"
+                break
+              fi
+              echo "Waiting API... ($i)"
+              sleep 2
+            done
 
             echo "Deploy successful"
 
