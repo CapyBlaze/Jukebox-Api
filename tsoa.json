@@ -3,7 +3,7 @@
     "noImplicitAdditionalProperties": "throw-on-extras",
     "controllerPathGlobs": ["src/controllers/**/*.controller.ts"],
     "spec": {
-        "outputDirectory": ".",
+        "outputDirectory": "docs",
         "specVersion": 3,
         "name": "Jukebox API",
         "title": "Jukebox API",

@@ -22,10 +22,20 @@ Designed to run on a local network, making it perfect for a Raspberry Pi or a sm
 
 <div>
     <h4>
-        <b>📖 View API Documentation:</b> <a href="https://jukebox.capyblaze.hackclub.app/docs" target="_blank">https://jukebox.capyblaze.hackclub.app/docs</a>
+        <b>📖 Swagger Documentation:</b>
+        <a href="https://jukebox.capyblaze.hackclub.app/docs" target="_blank">
+            https://jukebox.capyblaze.hackclub.app/docs
+        </a>
     </h4>
     <h4>
-        <b>🌐 API Endpoint:</b> <code>https://jukebox.capyblaze.hackclub.app/</code>
+        <b>📬 Postman Collection:</b>
+        <a href="./docs/postman/Jukebox API.postman_collection.json" target="_blank">
+            docs/postman/Jukebox API.postman_collection.json
+        </a>
+    </h4>
+    <h4>
+        <b>🌐 API Endpoint:</b>
+        <code>https://jukebox.capyblaze.hackclub.app/</code>
     </h4>
     <br>
     <details>

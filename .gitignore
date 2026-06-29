@@ -7,6 +7,5 @@ node_modules/
 *.log
 
 /src/generated/*
-swagger.json
 dev.db
 todo.todo

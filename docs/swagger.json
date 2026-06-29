@@ -1,0 +1,2318 @@
+{
+	"openapi": "3.0.0",
+	"components": {
+		"examples": {},
+		"headers": {},
+		"parameters": {},
+		"requestBodies": {},
+		"responses": {},
+		"schemas": {
+			"ApiResponseFormat": {
+				"properties": {
+					"success": {
+						"type": "boolean"
+					},
+					"message": {
+						"type": "string"
+					},
+					"data": {},
+					"error": {
+						"type": "string"
+					},
+					"timestamp": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"success",
+					"message",
+					"timestamp"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CreateVoteBody": {
+				"properties": {
+					"title": {
+						"type": "string"
+					},
+					"url": {
+						"type": "string"
+					},
+					"timeoutSec": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"title",
+					"url"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"VoteBody": {
+				"properties": {
+					"isUpvote": {
+						"type": "boolean"
+					}
+				},
+				"required": [
+					"isUpvote"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"AddToQueueBody": {
+				"properties": {
+					"title": {
+						"type": "string"
+					},
+					"provider": {
+						"type": "string"
+					},
+					"providerKey": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"title",
+					"provider",
+					"providerKey"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"AddPlaylistToQueueBody": {
+				"properties": {
+					"provider": {
+						"type": "string"
+					},
+					"playlistKey": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"provider",
+					"playlistKey"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"JoinBody": {
+				"properties": {
+					"pseudo": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"pseudo"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"SetProviderBody": {
+				"properties": {
+					"provider": {
+						"type": "string",
+						"enum": [
+							"youtube"
+						],
+						"nullable": false
+					}
+				},
+				"required": [
+					"provider"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UpdateMaxUsersBody": {
+				"properties": {
+					"maxUsers": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"maxUsers"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"RegisterAdminBody": {
+				"properties": {
+					"username": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"username",
+					"password"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"IPBanBody": {
+				"properties": {
+					"ipAddress": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"ipAddress"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UpdateApiLimitBody": {
+				"properties": {
+					"youtubeLimit": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"youtubeLimit"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UpdateCacheSizeBody": {
+				"properties": {
+					"searchCacheLineSize": {
+						"type": "number",
+						"format": "double"
+					},
+					"metadataCacheLineSize": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			}
+		},
+		"securitySchemes": {
+			"userGroupAuth": {
+				"type": "http",
+				"scheme": "bearer"
+			},
+			"adminGroupAuth": {
+				"type": "http",
+				"scheme": "bearer"
+			},
+			"adminAuth": {
+				"type": "http",
+				"scheme": "bearer"
+			}
+		}
+	},
+	"info": {
+		"title": "Jukebox API",
+		"version": "1.0.0",
+		"description": "Create a group with friends, add your music, vote in real time to choose the next song, and listen to it together!",
+		"license": {
+			"name": "MIT"
+		},
+		"contact": {
+			"name": "CapyBlaze",
+			"email": "capyblaze@gmail.com"
+		}
+	},
+	"paths": {
+		"/group/vote/{voteId}": {
+			"get": {
+				"operationId": "Get",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "Vote retrieved successfully",
+											"data": {
+												"id": 1,
+												"title": "Skip this song?",
+												"url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+												"userId": 4,
+												"downVote": 1,
+												"upVote": 4,
+												"endDate": "2026-06-29T16:01:47.879Z",
+												"groupId": "1ARM6G"
+											},
+											"timestamp": "2026-06-29T16:11:36.813Z"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"description": "Get details of a specific vote.",
+				"tags": [
+					"Vote"
+				],
+				"security": [
+					{
+						"userGroupAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "voteId",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
+			"delete": {
+				"operationId": "Delete",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "Vote deleted successfully",
+											"data": {
+												"id": 1,
+												"title": "Skip this song?",
+												"url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+												"userId": 4,
+												"downVote": 0,
+												"upVote": 1,
+												"endDate": "2026-06-29T16:01:47.879Z",
+												"groupId": "1ARM6G"
+											},
+											"timestamp": "2026-06-29T16:12:34.475Z"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"description": "Delete an existing vote.",
+				"tags": [
+					"Vote"
+				],
+				"security": [
+					{
+						"adminGroupAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "voteId",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/group/vote/create": {
+			"post": {
+				"operationId": "Create",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "Vote created successfully",
+											"data": {
+												"id": 1,
+												"title": "Skip this song?",
+												"url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+												"userId": 2,
+												"downVote": 0,
+												"upVote": 0,
+												"endDate": "2026-06-29T16:01:47.879Z",
+												"groupId": "1ARM6G"
+											},
+											"timestamp": "2026-06-29T16:01:17.899Z"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"description": "Create a new vote for the group (e.g. to skip a song or like a song). Defaults to a 3-minute timeout.",
+				"tags": [
+					"Vote"
+				],
+				"security": [
+					{
+						"adminGroupAuth": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateVoteBody"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/group/vote/{voteId}/vote": {
+			"post": {
+				"operationId": "Vote",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "Vote cast successfully",
+											"data": {
+												"id": 1,
+												"title": "Skip this song?",
+												"url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+												"userId": 4,
+												"downVote": 0,
+												"upVote": 1,
+												"endDate": "2026-06-29T16:01:47.879Z",
+												"groupId": "1ARM6G"
+											},
+											"timestamp": "2026-06-29T16:01:48.701Z"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"description": "Cast an upvote or downvote on an existing vote.",
+				"tags": [
+					"Vote"
+				],
+				"security": [
+					{
+						"userGroupAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "voteId",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/VoteBody"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/system/health": {
+			"get": {
+				"operationId": "HealthCheck",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "System is healthy",
+											"timestamp": "2026-06-29T15:14:02.359Z"
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "Check whether the API process is running and able to answer requests.",
+				"tags": [
+					"System"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/system/version": {
+			"get": {
+				"operationId": "GetVersion",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "API version retrieved",
+											"data": {
+												"version": "v1"
+											},
+											"timestamp": "2026-06-29T15:15:18.466Z"
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "Get the API version exposed by the running process.",
+				"tags": [
+					"System"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/search": {
+			"get": {
+				"operationId": "Search",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "Search results",
+											"data": {
+												"query": "never gonna give you up",
+												"results": [
+													{
+														"videoId": "dQw4w9WgXcQ",
+														"publishedAt": "2009-10-25T06:57:33Z",
+														"channelId": "UCuAXFkgsw1L7xaCfnd5JJOw",
+														"title": "Rick Astley - Never Gonna Give You Up (Official Video) (4K Remaster)",
+														"description": "The official video for “Never Gonna Give You Up” by Rick Astley. Never: The Autobiography OUT NOW! Follow this link to get ...",
+														"thumbnails": {
+															"default": {
+																"url": "https://i.ytimg.com/vi/dQw4w9WgXcQ/default.jpg"
+															}
+														},
+														"channelTitle": "Rick Astley"
+													}
+												],
+												"pageInfo": {
+													"totalResults": 0,
+													"resultsPerPage": 0
+												},
+												"nextPageToken": "CAoQAA",
+												"prevPageToken": "CBkQAA"
+											},
+											"timestamp": "2026-06-29T15:46:03.832Z"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Information missing",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"description": "Search YouTube for songs matching a query string.",
+				"tags": [
+					"Search"
+				],
+				"security": [
+					{
+						"userGroupAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"description": "The search query string.",
+						"in": "query",
+						"name": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "The maximum number of results to return (1-50).",
+						"in": "query",
+						"name": "maxResults",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"description": "The token for the page of results to return (for pagination).",
+						"in": "query",
+						"name": "pageToken",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "The type of results to return: \"video\" or \"playlist\". Defaults to \"video\".",
+						"in": "query",
+						"name": "type",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"video",
+								"playlist"
+							]
+						}
+					}
+				]
+			}
+		},
+		"/group/queue": {
+			"get": {
+				"operationId": "GetQueue",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "Queue information",
+											"data": [
+												{
+													"id": 2,
+													"title": "Never Gonna Give You Up",
+													"provider": "youtube",
+													"providerKey": "dQw4w9WgXcQ",
+													"durationSec": 214,
+													"groupId": "1ARM6G",
+													"userId": 4,
+													"addedAt": "2026-06-29T15:47:51.787Z",
+													"position": 1
+												}
+											],
+											"timestamp": "2026-06-29T15:51:35.640Z"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"description": "Get the full music queue for the group, ordered by insertion, with positions.",
+				"tags": [
+					"Queue"
+				],
+				"security": [
+					{
+						"userGroupAuth": []
+					}
+				],
+				"parameters": []
+			},
+			"post": {
+				"operationId": "AddToQueue",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "Music added to queue",
+											"data": {
+												"id": 2,
+												"title": "Never Gonna Give You Up",
+												"provider": "youtube",
+												"providerKey": "dQw4w9WgXcQ",
+												"durationSec": 214,
+												"groupId": "1ARM6G",
+												"userId": 4,
+												"addedAt": "2026-06-29T15:47:51.787Z"
+											},
+											"timestamp": "2026-06-29T15:47:51.796Z"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"description": "Add a new song to the group's queue. Duration is fetched automatically from YouTube.",
+				"tags": [
+					"Queue"
+				],
+				"security": [
+					{
+						"userGroupAuth": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AddToQueueBody"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/group/queue/{musicId}": {
+			"delete": {
+				"operationId": "DeleteFromQueue",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "Music deleted from queue",
+											"data": {
+												"id": 2,
+												"title": "Never Gonna Give You Up",
+												"provider": "youtube",
+												"providerKey": "dQw4w9WgXcQ",
+												"durationSec": 214,
+												"groupId": "1ARM6G",
+												"userId": 4,
+												"addedAt": "2026-06-29T15:47:51.787Z"
+											},
+											"timestamp": "2026-06-29T15:53:57.962Z"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"description": "Remove a song from the queue by its ID.",
+				"tags": [
+					"Queue"
+				],
+				"security": [
+					{
+						"adminGroupAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "musicId",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/group/queue/playlist": {
+			"post": {
+				"operationId": "AddPlaylistToQueue",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "Music added to queue",
+											"data": {
+												"addedCount": 50,
+												"playlistItems": [
+													{
+														"id": 4,
+														"title": "Taylor Swift - The Fate of Ophelia (Official Music Video)",
+														"provider": "youtube",
+														"providerKey": "ko70cExuzZM",
+														"durationSec": 239,
+														"groupId": "1ARM6G",
+														"userId": 4,
+														"addedAt": "2026-06-29T16:50:21.860Z"
+													}
+												]
+											},
+											"timestamp": "2026-06-29T16:50:21.879Z"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"description": "Add a playlist to the group's queue. Duration is fetched automatically from YouTube. (limited to 50 songs per playlist)",
+				"tags": [
+					"Queue"
+				],
+				"security": [
+					{
+						"userGroupAuth": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AddPlaylistToQueueBody"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/group/queue/current": {
+			"get": {
+				"operationId": "GetCurrentSong",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "Current song information",
+											"data": {
+												"id": 3,
+												"title": "Never Gonna Give You Up",
+												"provider": "youtube",
+												"providerKey": "dQw4w9WgXcQ",
+												"durationSec": 214,
+												"groupId": "1ARM6G",
+												"userId": 4,
+												"addedAt": "2026-06-29T15:54:11.270Z",
+												"startedAt": "2026-06-29T15:56:42.195Z",
+												"isPlaying": false
+											},
+											"timestamp": "2026-06-29T16:34:39.347Z"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"description": "Get information about the song currently playing, or null if none.",
+				"tags": [
+					"Queue"
+				],
+				"security": [
+					{
+						"userGroupAuth": []
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/group/queue/play": {
+			"post": {
+				"operationId": "PlaySong",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "Song played",
+											"data": {
+												"id": 3,
+												"title": "Never Gonna Give You Up",
+												"provider": "youtube",
+												"providerKey": "dQw4w9WgXcQ",
+												"durationSec": 214,
+												"groupId": "1ARM6G",
+												"userId": 4,
+												"addedAt": "2026-06-29T15:54:11.270Z"
+											},
+											"timestamp": "2026-06-29T15:56:42.208Z"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"description": "Move to and start playing the next song in the queue.",
+				"tags": [
+					"Queue"
+				],
+				"security": [
+					{
+						"adminGroupAuth": []
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/group/queue/pause": {
+			"post": {
+				"operationId": "PauseSong",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "Song paused",
+											"timestamp": "2026-06-29T15:57:05.838Z"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"description": "Pause playback of the current song.",
+				"tags": [
+					"Queue"
+				],
+				"security": [
+					{
+						"adminGroupAuth": []
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/group/queue/skip": {
+			"post": {
+				"operationId": "SkipSong",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "Song skipped",
+											"data": {
+												"id": 3,
+												"title": "Never Gonna Give You Up",
+												"provider": "youtube",
+												"providerKey": "dQw4w9WgXcQ",
+												"durationSec": 214,
+												"groupId": "1ARM6G",
+												"userId": 4,
+												"addedAt": "2026-06-29T15:54:11.270Z"
+											},
+											"timestamp": "2026-06-29T16:33:52.012Z"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"description": "Skip the current song and move to the next one in the queue.",
+				"tags": [
+					"Queue"
+				],
+				"security": [
+					{
+						"adminGroupAuth": []
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/jukebox/{streamToken}": {
+			"get": {
+				"operationId": "StreamAudio",
+				"responses": {
+					"204": {
+						"description": "No content"
+					},
+					"404": {
+						"description": "Stream token not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"description": "Serve the public jukebox player page for a given stream token.",
+				"tags": [
+					"Jukebox"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "streamToken",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/jukebox/{streamToken}/now-playing": {
+			"get": {
+				"operationId": "NowPlaying",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "Now playing information retrieved successfully",
+											"data": {
+												"id": 3,
+												"title": "Never Gonna Give You Up",
+												"provider": "youtube",
+												"providerKey": "dQw4w9WgXcQ",
+												"durationSec": 214,
+												"groupId": "1ARM6G",
+												"userId": 4,
+												"addedAt": "2026-06-29T15:54:11.270Z",
+												"startedAt": "2026-06-29T15:56:42.195Z",
+												"isPlaying": false
+											},
+											"timestamp": "2026-06-29T15:58:32.345Z"
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "Get information about the song currently playing for a given stream token, or null if nothing is playing.",
+				"tags": [
+					"Jukebox"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "streamToken",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/group/create": {
+			"post": {
+				"operationId": "CreateGroup",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "Group created",
+											"data": {
+												"code": "1ARM6G",
+												"maxUsers": 10,
+												"adminToken": "49efc6d7-3fb7-410e-a063-1fc35c1bdde6"
+											},
+											"timestamp": "2026-06-29T15:16:24.692Z"
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "Create a new group and return its access code and admin token.",
+				"tags": [
+					"Group"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/group/{groupId}/join": {
+			"post": {
+				"operationId": "JoinGroup",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "User joined group",
+											"data": {
+												"token": "3760c6c5-1515-460f-9d26-2aad9b49cfe4"
+											},
+											"timestamp": "2026-06-29T15:28:16.960Z"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Information missing",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Group not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					},
+					"409": {
+						"description": "Conflict",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"description": "Join an existing group using its code and a chosen pseudo.",
+				"tags": [
+					"Group"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "groupId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/JoinBody"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/group": {
+			"get": {
+				"operationId": "ListUsers",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "Group information",
+											"data": {
+												"code": "1ARM6G",
+												"numberOfUsers": 2,
+												"maxUsers": 10,
+												"members": [
+													{
+														"pseudo": "Host"
+													},
+													{
+														"pseudo": "Sterling26"
+													}
+												]
+											},
+											"timestamp": "2026-06-29T15:28:45.304Z"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"description": "Get information about the group the authenticated user belongs to.",
+				"tags": [
+					"Group"
+				],
+				"security": [
+					{
+						"userGroupAuth": []
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/group/leave": {
+			"delete": {
+				"operationId": "LeaveGroup",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "User left group",
+											"data": {
+												"pseudo": "Sterling26",
+												"groupId": "1ARM6G"
+											},
+											"timestamp": "2026-06-29T15:31:12.878Z"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"description": "Remove the authenticated user from their current group.",
+				"tags": [
+					"Group"
+				],
+				"security": [
+					{
+						"userGroupAuth": []
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/group/provider": {
+			"patch": {
+				"operationId": "SetProvider",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "Provider set",
+											"data": {
+												"code": "1ARM6G",
+												"provider": "youtube",
+												"isPlaying": false
+											},
+											"timestamp": "2026-06-29T15:31:43.435Z"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"description": "Set the music provider used by the group (currently only YouTube is supported).",
+				"tags": [
+					"Group"
+				],
+				"security": [
+					{
+						"adminGroupAuth": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SetProviderBody"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/group/max-users": {
+			"patch": {
+				"operationId": "UpdateMaxUsers",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "Max users updated",
+											"data": {
+												"code": "1ARM6G",
+												"maxUsers": 15
+											},
+											"timestamp": "2026-06-29T15:33:34.377Z"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Invalid input",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"description": "Update the maximum number of users allowed in the group.",
+				"tags": [
+					"Group"
+				],
+				"security": [
+					{
+						"adminGroupAuth": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UpdateMaxUsersBody"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/group/jukebox/token": {
+			"get": {
+				"operationId": "GetStreamToken",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "Stream token retrieved",
+											"data": {
+												"streamToken": "3f2f4dde-f0c6-457d-a0d9-6c698c24d353"
+											},
+											"timestamp": "2026-06-29T15:33:48.840Z"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Stream token not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"description": "Retrieve the current jukebox stream token for the group.",
+				"tags": [
+					"Group"
+				],
+				"security": [
+					{
+						"adminGroupAuth": []
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/group/jukebox/token/rotate": {
+			"patch": {
+				"operationId": "RotateStreamToken",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "Stream token rotated successfully",
+											"data": {
+												"newStreamToken": "2da9464a-243f-4025-99a5-09398e0e72a4"
+											},
+											"timestamp": "2026-06-29T15:34:46.674Z"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"description": "Generate a new jukebox stream token, invalidating the previous one.",
+				"tags": [
+					"Group"
+				],
+				"security": [
+					{
+						"adminGroupAuth": []
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/admin/login": {
+			"post": {
+				"operationId": "Login",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "User logged in",
+											"data": {
+												"token": "1c565e42-3f76-4f78-b9a4-26dcddac786c",
+												"name": "admin"
+											},
+											"timestamp": "2026-06-29T16:14:18.099Z"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Missing credentials",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"description": "Authenticate as an administrator and receive the bearer token required for admin routes.",
+				"tags": [
+					"Admin"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/RegisterAdminBody"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/admin/ip/ban": {
+			"post": {
+				"operationId": "BanIP",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "IP banned",
+											"data": {
+												"ipAddress": "203.0.113.42"
+											},
+											"timestamp": "2026-06-29T16:18:49.137Z"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Missing IP address",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"description": "Ban an IP address from accessing the API.",
+				"tags": [
+					"Admin"
+				],
+				"security": [
+					{
+						"adminAuth": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/IPBanBody"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/admin/ip/unban": {
+			"post": {
+				"operationId": "UnbanIP",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "IP unbanned",
+											"data": {
+												"ipAddress": "203.0.113.42"
+											},
+											"timestamp": "2026-06-29T16:21:02.254Z"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Missing IP address",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"description": "Remove a ban from an IP address.",
+				"tags": [
+					"Admin"
+				],
+				"security": [
+					{
+						"adminAuth": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/IPBanBody"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/admin/ip/banned": {
+			"get": {
+				"operationId": "GetBannedIPs",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "Banned IPs fetched",
+											"data": [
+												{
+													"ipAddress": "203.0.113.42",
+													"bannedAt": "2026-06-29T16:18:49.126Z"
+												}
+											],
+											"timestamp": "2026-06-29T16:20:28.338Z"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"description": "Get a list of all banned IP addresses.",
+				"tags": [
+					"Admin"
+				],
+				"security": [
+					{
+						"adminAuth": []
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/admin/api/limit": {
+			"patch": {
+				"operationId": "UpdateApiLimit",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "YouTube API limit updated",
+											"data": {
+												"youtubeLimit": 10000
+											},
+											"timestamp": "2026-06-29T16:23:09.664Z"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Invalid input",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"description": "Update the daily YouTube API call limit.",
+				"tags": [
+					"Admin"
+				],
+				"security": [
+					{
+						"adminAuth": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UpdateApiLimitBody"
+							}
+						}
+					}
+				}
+			},
+			"get": {
+				"operationId": "GetApiLimit",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "YouTube API limit fetched",
+											"data": {
+												"youtubeLimit": 10000
+											},
+											"timestamp": "2026-06-29T16:32:05.221Z"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Admin"
+				],
+				"security": [
+					{
+						"adminAuth": []
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/admin/api/usage": {
+			"get": {
+				"operationId": "GetApiUsage",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "YouTube API usage fetched",
+											"data": [
+												{
+													"id": "cmqzdv4130000xkkli9ocs5y6",
+													"provider": "youtube",
+													"startDate": "2026-06-29T00:00:00.000Z",
+													"endDate": "2026-06-29T23:59:59.999Z",
+													"used": 101,
+													"lastUsed": "2026-06-29T15:39:13.575Z"
+												}
+											],
+											"timestamp": "2026-06-29T16:32:42.506Z"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Admin"
+				],
+				"security": [
+					{
+						"adminAuth": []
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/admin/cache/size": {
+			"patch": {
+				"operationId": "UpdateCacheSize",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "Cache sizes updated",
+											"data": {
+												"searchCacheLineSize": 200,
+												"metadataCacheLineSize": 500
+											},
+											"timestamp": "2026-06-29T16:24:06.726Z"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Invalid input",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"description": "Update the maximum number of cache lines for the search and metadata caches.",
+				"tags": [
+					"Admin"
+				],
+				"security": [
+					{
+						"adminAuth": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UpdateCacheSizeBody"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/admin/cache/clear": {
+			"delete": {
+				"operationId": "ClearCache",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "Cache cleared",
+											"timestamp": "2026-06-29T16:24:30.768Z"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"description": "Clear all server-side caches (search and metadata).",
+				"tags": [
+					"Admin"
+				],
+				"security": [
+					{
+						"adminAuth": []
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/admin/stats": {
+			"get": {
+				"operationId": "GetStats",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "Admin stats fetched",
+											"data": {
+												"groups": 2,
+												"users": 3,
+												"apiVersion": "v1",
+												"uptime": 22045,
+												"memory": {
+													"usedMB": 18570,
+													"freeMB": 13555,
+													"totalMB": 32125,
+													"usagePercent": 57.81
+												},
+												"cpuUsage": "9.36%"
+											},
+											"timestamp": "2026-06-29T16:25:03.147Z"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"description": "Get global game totals and host resource statistics for the admin dashboard.",
+				"tags": [
+					"Admin"
+				],
+				"security": [
+					{
+						"adminAuth": []
+					}
+				],
+				"parameters": []
+			}
+		}
+	},
+	"servers": [
+		{
+			"url": "https://jukebox.capyblaze.hackclub.app/"
+		}
+	]
+}

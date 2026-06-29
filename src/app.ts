@@ -4,7 +4,7 @@ import path from "path";
 import swaggerUi from "swagger-ui-express";
 import { fileURLToPath } from "url";
 
-import swaggerDocument from "../swagger.json" with { type: "json" };
+import swaggerDocument from "../docs/swagger.json" with { type: "json" };
 import { RegisterRoutes } from "./generated/routes.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
 import { ipBannedHandler } from "./middlewares/ipBanned.middleware.js";
