@@ -137,7 +137,20 @@ const YouTubePlaylistItemSchema = z.object({
 const YouTubePlaylistItemArraySchema = z.array(YouTubePlaylistItemSchema);
 export type YouTubePlaylistItem = z.infer<typeof YouTubePlaylistItemArraySchema>;
 
-export async function searchYouTube(query: string): Promise<YouTubeSearchResult[]> {
+export async function searchYouTube(
+    query: string,
+    maxResults?: number,
+    pageToken?: string,
+    type?: "video" | "playlist"
+): Promise<{
+    items: YouTubeSearchResult[];
+    pageInfo: {
+        totalResults: number;
+        resultsPerPage: number;
+    };
+    nextPageToken: string;
+    prevPageToken: string;
+}> {
     const todayStart = new Date(new Date().setUTCHours(0, 0, 0, 0));
     const todayEnd = new Date(new Date().setUTCHours(23, 59, 59, 999));
 
@@ -151,7 +164,15 @@ export async function searchYouTube(query: string): Promise<YouTubeSearchResult[
     });
 
     if (cache) {
-        return YouTubeSearchResultArraySchema.parse(cache.results);
+        return {
+            items: YouTubeSearchResultArraySchema.parse(cache.results),
+            pageInfo: {
+                totalResults: 0,
+                resultsPerPage: 0,
+            },
+            nextPageToken: "",
+            prevPageToken: "",
+        };
     }
 
     const usage = await prisma.apiUsage.findUnique({
@@ -176,9 +197,13 @@ export async function searchYouTube(query: string): Promise<YouTubeSearchResult[
         key: API_KEY!,
         part: "snippet",
         q: query,
-        type: "video",
-        maxResults: "50",
+        type: type || "video",
+        maxResults: (maxResults || 50).toString(),
     });
+
+    if (pageToken) {
+        params.append("pageToken", pageToken);
+    }
 
     const response = await fetch(`https://www.googleapis.com/youtube/v3/search?${params}`);
 
@@ -227,7 +252,15 @@ export async function searchYouTube(query: string): Promise<YouTubeSearchResult[
 
     await CacheService.cleanupSearchCache();
 
-    return validatedItems;
+    return {
+        items: validatedItems,
+        pageInfo: {
+            totalResults: data.pageInfo?.totalResults || 0,
+            resultsPerPage: data.pageInfo?.resultsPerPage || 0,
+        },
+        nextPageToken: data.nextPageToken || "",
+        prevPageToken: data.prevPageToken || "",
+    };
 }
 
 function chunk<T>(arr: T[], size: number): T[][] {

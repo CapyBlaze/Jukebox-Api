@@ -34,19 +34,35 @@ export class SearchController extends Controller {
                     }
                 }
             ],
+            pageInfo: {
+                totalResults: 45,
+                resultsPerPage: 15,
+            },
+            nextPageToken: "CDIQAA",
+            prevPageToken: "CBkQAA",
         },
         timestamp: "2026-06-17T18:30:00.000Z",
     })
     @Response<ApiResponseFormat>(400, "Information missing")
     @Response<ApiResponseFormat>(401, "Unauthorized")
-    public async search(@Query("q") query?: string): Promise<ApiResponseFormat> {
+    public async search(
+        @Query("q") query?: string, 
+        @Query("maxResults") maxResults?: number, 
+        @Query("pageToken") pageToken?: string,
+        @Query("type") type?: "video" | "playlist" 
+    ): Promise<ApiResponseFormat> {
         if (!query) {
             this.setStatus(400);
             return ApiResponse.error("Information missing", "Query is required");
         }
 
-        const results = await SearchService.searchYouTube(query);
-        const resultsCleaned = results.map((video) => ({
+        if (maxResults && (maxResults < 1 || maxResults > 50)) {
+            this.setStatus(400);
+            return ApiResponse.error("Information missing", "maxResults must be between 1 and 50");
+        }
+
+        const results = await SearchService.searchYouTube(query, maxResults, pageToken, type);
+        const resultsCleaned = results.items.map((video) => ({
             id: video.id 
                 ? { videoId: video.id.videoId } 
                 : null,
@@ -70,7 +86,13 @@ export class SearchController extends Controller {
 
         return ApiResponse.success("Search results", { 
             query: query, 
-            results: resultsCleaned 
+            results: resultsCleaned,
+            pageInfo: {
+                totalResults: results.pageInfo.totalResults,
+                resultsPerPage: results.pageInfo.resultsPerPage,
+            },
+            nextPageToken: results.nextPageToken,
+            prevPageToken: results.prevPageToken,
         });
     }
 }
