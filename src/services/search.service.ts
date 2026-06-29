@@ -7,61 +7,67 @@ import * as CacheService from "./cache.service.js";
 
 const API_KEY = process.env.YOUTUBE_API_KEY;
 
-interface YouTubeSearchResult {
-    kind: string;
-    etag: string;
-    id: {
-        kind: string;
-        videoId: string;
-    };
-    snippet: {
-        publishedAt: string;
-        channelId: string;
-        title: string;
-        description: string;
-        thumbnails: {
-            default: {
-                url: string;
-            };
-            medium: {
-                url: string;
-            };
-            high: {
-                url: string;
-            };
-        };
-        channelTitle: string;
-        liveBroadcastContent: string;
-        publishTime: string;
-    };
-}
-
 const YouTubeSearchResultSchema = z.object({
-    kind: z.string(),
-    etag: z.string(),
-    id: z.object({
-        kind: z.string(),
-        videoId: z.string(),
-    }),
-    snippet: z.object({
-        publishedAt: z.string(),
-        channelId: z.string(),
-        title: z.string(),
-        description: z.string(),
-        thumbnails: z.object({
-            default: z.object({ url: z.string() }),
-            medium: z.object({ url: z.string() }),
-            high: z.object({ url: z.string() }),
-        }),
-        channelTitle: z.string(),
-        liveBroadcastContent: z.string(),
-        publishTime: z.string(),
-    }),
+    kind: z.string().nullable().default(null),
+    etag: z.string().nullable().default(null),
+    id: z
+        .object({
+            kind: z.string().nullable().default(null),
+            videoId: z.string().nullable().default(null),
+            channelId: z.string().optional().nullable().default(null),
+            playlistId: z.string().optional().nullable().default(null),
+        })
+        .nullable()
+        .default(null),
+    snippet: z
+        .object({
+            publishedAt: z.string().nullable().default(null),
+            channelId: z.string().nullable().default(null),
+            title: z.string().nullable().default(null),
+            description: z.string().nullable().default(null),
+            thumbnails: z
+                .object({
+                    default: z
+                        .object({
+                            url: z.string().nullable().default(null),
+                            width: z.number().nullable().default(null),
+                            height: z.number().nullable().default(null),
+                        })
+                        .nullable()
+                        .default(null),
+                    medium: z
+                        .object({
+                            url: z.string().nullable().default(null),
+                            width: z.number().nullable().default(null),
+                            height: z.number().nullable().default(null),
+                        })
+                        .nullable()
+                        .default(null),
+                    high: z
+                        .object({
+                            url: z.string().nullable().default(null),
+                            width: z.number().nullable().default(null),
+                            height: z.number().nullable().default(null),
+                        })
+                        .nullable()
+                        .default(null),
+                })
+                .nullable()
+                .default(null),
+            channelTitle: z.string().nullable().default(null),
+            liveBroadcastContent: z.string().nullable().default(null),
+        })
+        .nullable()
+        .default(null),
 });
 
 const YouTubeSearchResultArraySchema = z.array(YouTubeSearchResultSchema);
+export type YouTubeSearchResult = z.infer<typeof YouTubeSearchResultSchema>;
 
 export async function searchYouTube(query: string): Promise<YouTubeSearchResult[]> {
+    const todayStart = new Date(new Date().setUTCHours(0, 0, 0, 0));
+    const todayEnd = new Date(new Date().setUTCHours(23, 59, 59, 999));
+
     const cache = await prisma.searchCache.findUnique({
         where: {
             provider_query: {
@@ -79,8 +85,8 @@ export async function searchYouTube(query: string): Promise<YouTubeSearchResult[
         where: {
             provider_startDate_endDate: {
                 provider: "youtube",
-                startDate: new Date(new Date().setUTCHours(0, 0, 0, 0)),
-                endDate: new Date(new Date().setUTCHours(23, 59, 59, 999)),
+                startDate: todayStart,
+                endDate: todayEnd,
             },
         },
     });
@@ -104,13 +110,14 @@ export async function searchYouTube(query: string): Promise<YouTubeSearchResult[
     }
 
     const data = await response.json();
+    const validatedItems = YouTubeSearchResultArraySchema.parse(data.items);
 
     await prisma.apiUsage.upsert({
         where: {
             provider_startDate_endDate: {
                 provider: "youtube",
-                startDate: new Date(new Date().setUTCHours(0, 0, 0, 0)),
-                endDate: new Date(new Date().setUTCHours(23, 59, 59, 999)),
+                startDate: todayStart,
+                endDate: todayEnd,
             },
         },
         update: {
@@ -118,9 +125,9 @@ export async function searchYouTube(query: string): Promise<YouTubeSearchResult[
         },
         create: {
             provider: "youtube",
-            startDate: new Date(new Date().setUTCHours(0, 0, 0, 0)),
-            endDate: new Date(new Date().setUTCHours(23, 59, 59, 999)),
-            used: 1,
+            startDate: todayStart,
+            endDate: todayEnd,
+            used: 100,
         },
     });
 
@@ -132,21 +139,24 @@ export async function searchYouTube(query: string): Promise<YouTubeSearchResult[
             },
         },
         update: {
-            results: data.items,
+            results: validatedItems,
         },
         create: {
             provider: "youtube",
             query,
-            results: data.items,
+            results: validatedItems,
         },
     });
 
     await CacheService.cleanupSearchCache();
 
-    return data.items;
+    return validatedItems;
 }
 
 export async function durationYoutube(videoId: string): Promise<number | null> {
+    const todayStart = new Date(new Date().setUTCHours(0, 0, 0, 0));
+    const todayEnd = new Date(new Date().setUTCHours(23, 59, 59, 999));
+
     const cache = await prisma.metadataCache.findUnique({
         where: {
             provider_providerKey: {
@@ -164,8 +174,8 @@ export async function durationYoutube(videoId: string): Promise<number | null> {
         where: {
             provider_startDate_endDate: {
                 provider: "youtube",
-                startDate: new Date(new Date().setUTCHours(0, 0, 0, 0)),
-                endDate: new Date(new Date().setUTCHours(23, 59, 59, 999)),
+                startDate: todayStart,
+                endDate: todayEnd,
             },
         },
     });
@@ -187,8 +197,8 @@ export async function durationYoutube(videoId: string): Promise<number | null> {
         where: {
             provider_startDate_endDate: {
                 provider: "youtube",
-                startDate: new Date(new Date().setUTCHours(0, 0, 0, 0)),
-                endDate: new Date(new Date().setUTCHours(23, 59, 59, 999)),
+                startDate: todayStart,
+                endDate: todayEnd,
             },
         },
         update: {
@@ -196,8 +206,8 @@ export async function durationYoutube(videoId: string): Promise<number | null> {
         },
         create: {
             provider: "youtube",
-            startDate: new Date(new Date().setUTCHours(0, 0, 0, 0)),
-            endDate: new Date(new Date().setUTCHours(23, 59, 59, 999)),
+            startDate: todayStart,
+            endDate: todayEnd,
             used: 1,
         },
     });
