@@ -37,21 +37,21 @@ export class JukeboxController extends Controller {
     /** Get information about the song currently playing for a given stream token, or null if nothing is playing. */
     @Get("{streamToken}/now-playing")
     @Example<ApiResponseFormat>({
-        success: true,
-        message: "Now playing information retrieved successfully",
-        data: {
-            id: 12,
-            groupId: "X7K2QP",
-            title: "Never Gonna Give You Up",
-            provider: "youtube",
-            providerKey: "dQw4w9WgXcQ",
-            durationSec: 212,
-            userId: 2,
-            addedAt: "2026-06-17T18:25:00.000Z",
-            startedAt: "2026-06-17T18:29:00.000Z",
-            isPlaying: true,
+        "success": true,
+        "message": "Now playing information retrieved successfully",
+        "data": {
+            "id": 3,
+            "title": "Never Gonna Give You Up",
+            "provider": "youtube",
+            "providerKey": "dQw4w9WgXcQ",
+            "durationSec": 214,
+            "groupId": "1ARM6G",
+            "userId": 4,
+            "addedAt": "2026-06-29T15:54:11.270Z",
+            "startedAt": "2026-06-29T15:56:42.195Z",
+            "isPlaying": false
         },
-        timestamp: "2026-06-17T18:30:00.000Z",
+        "timestamp": "2026-06-29T15:58:32.345Z"
     })
     public async nowPlaying(
         @Path("streamToken") streamToken: string

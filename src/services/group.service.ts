@@ -166,3 +166,17 @@ export async function jukeboxToken(groupId: string): Promise<string | null> {
 
     return group.streamToken;
 }
+
+export async function updateMaxUsers(
+    groupId: string,
+    maxUsers: number
+): Promise<{
+    code: string;
+    maxUsers: number;
+}> {
+    return await prisma.group.update({
+        where: { code: groupId },
+        data: { maxUsers },
+        select: { code: true, maxUsers: true },
+    });
+}

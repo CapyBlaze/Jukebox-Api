@@ -1,4 +1,4 @@
-import type { IpBan } from "@prisma/client";
+import type { ApiUsage, IpBan } from "@prisma/client";
 
 import { HttpError } from "../middlewares/error.middleware.js";
 import { prisma } from "../prisma.js";
@@ -68,4 +68,13 @@ export async function countUsers(): Promise<number> {
 export async function clearCache(): Promise<void> {
     await prisma.searchCache.deleteMany({});
     await prisma.metadataCache.deleteMany({});
+}
+
+export async function getYoutubeApiUsage(): Promise<ApiUsage[]> {
+    return await prisma.apiUsage.findMany({
+        where: {
+            startDate: new Date(new Date().setUTCHours(0, 0, 0, 0)),
+            endDate: new Date(new Date().setUTCHours(23, 59, 59, 999)),
+        },
+    });
 }

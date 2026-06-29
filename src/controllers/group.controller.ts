@@ -27,20 +27,24 @@ interface SetProviderBody {
     provider: "youtube";
 }
 
+interface UpdateMaxUsersBody {
+    maxUsers: number;
+}
+
 @Route("group")
 @Tags("Group")
 export class GroupController extends Controller {
     /** Create a new group and return its access code and admin token. */
     @Post("create")
     @Example<ApiResponseFormat>({
-        success: true,
-        message: "Group created",
-        data: {
-            code: "X7K2QP",
-            maxUsers: 20,
-            adminToken: "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+        "success": true,
+        "message": "Group created",
+        "data": {
+            "code": "1ARM6G",
+            "maxUsers": 10,
+            "adminToken": "49efc6d7-3fb7-410e-a063-1fc35c1bdde6"
         },
-        timestamp: "2026-06-17T18:30:00.000Z",
+        "timestamp": "2026-06-29T15:16:24.692Z"
     })
     public async createGroup(): Promise<ApiResponseFormat> {
         const group = await GroupService.create();
@@ -52,12 +56,12 @@ export class GroupController extends Controller {
     /** Join an existing group using its code and a chosen pseudo. */
     @Post("{groupId}/join")
     @Example<ApiResponseFormat>({
-        success: true,
-        message: "User joined group",
-        data: {
-            token: "8e2f9c1a-3b4d-4e5f-9a0b-1c2d3e4f5a6b",
+        "success": true,
+        "message": "User joined group",
+        "data": {
+            "token": "3760c6c5-1515-460f-9d26-2aad9b49cfe4"
         },
-        timestamp: "2026-06-17T18:30:00.000Z",
+        "timestamp": "2026-06-29T15:28:16.960Z"
     })
     @Response<ApiResponseFormat>(400, "Information missing")
     @Response<ApiResponseFormat>(404, "Group not found")
@@ -95,18 +99,22 @@ export class GroupController extends Controller {
     @Get("")
     @Security(SecurityRole.UserGroup)
     @Example<ApiResponseFormat>({
-        success: true,
-        message: "Group information",
-        data: {
-            code: "X7K2QP",
-            numberOfUsers: 2,
-            maxUsers: 20,
-            members: [
-                { pseudo: "Host" },
-                { pseudo: "Alice" },
-            ],
+        "success": true,
+        "message": "Group information",
+        "data": {
+            "code": "1ARM6G",
+            "numberOfUsers": 2,
+            "maxUsers": 10,
+            "members": [
+                {
+                    "pseudo": "Host"
+                },
+                {
+                    "pseudo": "Sterling26"
+                }
+            ]
         },
-        timestamp: "2026-06-17T18:30:00.000Z",
+        "timestamp": "2026-06-29T15:28:45.304Z"
     })
     @Response<ApiResponseFormat>(401, "Unauthorized")
     public async listUsers(@Request() req: AuthenticatedRequest): Promise<ApiResponseFormat> {
@@ -120,13 +128,13 @@ export class GroupController extends Controller {
     @Delete("leave")
     @Security(SecurityRole.UserGroup)
     @Example<ApiResponseFormat>({
-        success: true,
-        message: "User left group",
-        data: {
-            pseudo: "Alice",
-            groupId: "X7K2QP",
+        "success": true,
+        "message": "User left group",
+        "data": {
+            "pseudo": "Sterling26",
+            "groupId": "1ARM6G"
         },
-        timestamp: "2026-06-17T18:30:00.000Z",
+        "timestamp": "2026-06-29T15:31:12.878Z"
     })
     @Response<ApiResponseFormat>(401, "Unauthorized")
     public async leaveGroup(@Request() req: AuthenticatedRequest): Promise<ApiResponseFormat> {
@@ -144,14 +152,14 @@ export class GroupController extends Controller {
     @Patch("provider")
     @Security(SecurityRole.AdminGroup)
     @Example<ApiResponseFormat>({
-        success: true,
-        message: "Provider set",
-        data: {
-            code: "X7K2QP",
-            provider: "youtube",
-            isPlaying: false,
+        "success": true,
+        "message": "Provider set",
+        "data": {
+            "code": "1ARM6G",
+            "provider": "youtube",
+            "isPlaying": false
         },
-        timestamp: "2026-06-17T18:30:00.000Z",
+        "timestamp": "2026-06-29T15:31:43.435Z"
     })
     @Response<ApiResponseFormat>(401, "Unauthorized")
     public async setProvider(
@@ -166,16 +174,47 @@ export class GroupController extends Controller {
         return ApiResponse.success("Provider set", result);
     }
 
+    /** Update the maximum number of users allowed in the group. */
+    @Patch("max-users")
+    @Security(SecurityRole.AdminGroup)
+    @Example<ApiResponseFormat>({
+        "success": true,
+        "message": "Max users updated",
+        "data": {
+            "code": "1ARM6G",
+            "maxUsers": 15
+        },
+        "timestamp": "2026-06-29T15:33:34.377Z"
+    })
+    @Response<ApiResponseFormat>(400, "Invalid input")
+    @Response<ApiResponseFormat>(401, "Unauthorized")
+    public async updateMaxUsers(
+        @Request() req: AuthenticatedAdminRequest,
+        @Body() body: UpdateMaxUsersBody
+    ): Promise<ApiResponseFormat> {
+        const groupId = req.user.managedGroup.code;
+        const { maxUsers } = body;
+
+        if (maxUsers === undefined || maxUsers < 1) {
+            this.setStatus(400);
+            return ApiResponse.error("Invalid input", "maxUsers must be a positive integer");
+        }
+
+        const result = await GroupService.updateMaxUsers(groupId, maxUsers);
+
+        return ApiResponse.success("Max users updated", result);
+    }
+
     /** Retrieve the current jukebox stream token for the group. */
     @Get("jukebox/token")
     @Security(SecurityRole.AdminGroup)
     @Example<ApiResponseFormat>({
-        success: true,
-        message: "Stream token retrieved",
-        data: {
-            streamToken: "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+        "success": true,
+        "message": "Stream token retrieved",
+        "data": {
+            "streamToken": "3f2f4dde-f0c6-457d-a0d9-6c698c24d353"
         },
-        timestamp: "2026-06-17T18:30:00.000Z",
+        "timestamp": "2026-06-29T15:33:48.840Z"
     })
     @Response<ApiResponseFormat>(404, "Stream token not found")
     @Response<ApiResponseFormat>(401, "Unauthorized")
@@ -197,12 +236,12 @@ export class GroupController extends Controller {
     @Patch("jukebox/token/rotate")
     @Security(SecurityRole.AdminGroup)
     @Example<ApiResponseFormat>({
-        success: true,
-        message: "Stream token rotated successfully",
-        data: {
-            newStreamToken: "8e2f9c1a-3b4d-4e5f-9a0b-1c2d3e4f5a6b",
+        "success": true,
+        "message": "Stream token rotated successfully",
+        "data": {
+            "newStreamToken": "2da9464a-243f-4025-99a5-09398e0e72a4"
         },
-        timestamp: "2026-06-17T18:30:00.000Z",
+        "timestamp": "2026-06-29T15:34:46.674Z"
     })
     @Response<ApiResponseFormat>(401, "Unauthorized")
     public async rotateStreamToken(

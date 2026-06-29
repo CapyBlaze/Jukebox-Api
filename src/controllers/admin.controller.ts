@@ -31,13 +31,13 @@ export class AdminController extends Controller {
     /** Authenticate as an administrator and receive the bearer token required for admin routes. */
     @Post("login")
     @Example<ApiResponseFormat>({
-        success: true,
-        message: "User logged in",
-        data: {
-            token: "admin_eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
-            name: "admin",
+        "success": true,
+        "message": "User logged in",
+        "data": {
+            "token": "1c565e42-3f76-4f78-b9a4-26dcddac786c",
+            "name": "admin"
         },
-        timestamp: "2026-06-17T18:30:00.000Z",
+        "timestamp": "2026-06-29T16:14:18.099Z"
     })
     @Response<ApiResponseFormat>(400, "Missing credentials")
     public async login(@Body() body: RegisterAdminBody): Promise<ApiResponseFormat> {
@@ -50,7 +50,7 @@ export class AdminController extends Controller {
 
         const token = await AdminService.login(username, password);
 
-        this.setStatus(201);
+        this.setStatus(200);
         return ApiResponse.success("User logged in", {
             token: token,
             name: username,
@@ -61,10 +61,12 @@ export class AdminController extends Controller {
     @Post("ip/ban")
     @Security(SecurityRole.Admin)
     @Example<ApiResponseFormat>({
-        success: true,
-        message: "IP banned",
-        data: { ipAddress: "203.0.113.42" },
-        timestamp: "2026-06-17T18:30:00.000Z",
+        "success": true,
+        "message": "IP banned",
+        "data": {
+            "ipAddress": "203.0.113.42"
+        },
+        "timestamp": "2026-06-29T16:18:49.137Z"
     })
     @Response<ApiResponseFormat>(400, "Missing IP address")
     @Response<ApiResponseFormat>(401, "Unauthorized")
@@ -87,10 +89,12 @@ export class AdminController extends Controller {
     @Post("ip/unban")
     @Security(SecurityRole.Admin)
     @Example<ApiResponseFormat>({
-        success: true,
-        message: "IP unbanned",
-        data: { ipAddress: "203.0.113.42" },
-        timestamp: "2026-06-17T18:30:00.000Z",
+        "success": true,
+        "message": "IP unbanned",
+        "data": {
+            "ipAddress": "203.0.113.42"
+        },
+        "timestamp": "2026-06-29T16:21:02.254Z"
     })
     @Response<ApiResponseFormat>(400, "Missing IP address")
     @Response<ApiResponseFormat>(401, "Unauthorized")
@@ -109,16 +113,42 @@ export class AdminController extends Controller {
         });
     }
 
+    /** Get a list of all banned IP addresses. */
+    @Get("ip/banned")
+    @Security(SecurityRole.Admin)
+    @Example<ApiResponseFormat>({
+        "success": true,
+        "message": "Banned IPs fetched",
+        "data": [
+            {
+                "ipAddress": "203.0.113.42",
+                "bannedAt": "2026-06-29T16:18:49.126Z"
+            }
+        ],
+        "timestamp": "2026-06-29T16:20:28.338Z"
+    })
+    @Response<ApiResponseFormat>(401, "Unauthorized")
+    public async getBannedIPs(): Promise<ApiResponseFormat> {
+        const bannedIps = await AdminService.getBannedIps();
+
+        const formattedBannedIps = bannedIps.map((ban) => ({
+            ipAddress: ban.ipAddress,
+            bannedAt: ban.bannedAt,
+        }));
+
+        return ApiResponse.success("Banned IPs fetched", formattedBannedIps);
+    }
+
     /** Update the daily YouTube API call limit. */
     @Patch("api/limit")
     @Security(SecurityRole.Admin)
     @Example<ApiResponseFormat>({
-        success: true,
-        message: "YouTube API limit updated",
-        data: {
-            youtubeLimit: 10000,
+        "success": true,
+        "message": "YouTube API limit updated",
+        "data": {
+            "youtubeLimit": 10000
         },
-        timestamp: "2026-06-17T18:30:00.000Z",
+        "timestamp": "2026-06-29T16:23:09.664Z"
     })
     @Response<ApiResponseFormat>(400, "Invalid input")
     @Response<ApiResponseFormat>(401, "Unauthorized")
@@ -138,17 +168,58 @@ export class AdminController extends Controller {
         });
     }
 
+    @Get("api/limit")
+    @Security(SecurityRole.Admin)
+    @Example<ApiResponseFormat>({
+        "success": true,
+        "message": "YouTube API limit fetched",
+        "data": {
+            "youtubeLimit": 10000
+        },
+        "timestamp": "2026-06-29T16:32:05.221Z"
+    })
+    @Response<ApiResponseFormat>(401, "Unauthorized")
+    public async getApiLimit(): Promise<ApiResponseFormat> {
+        return ApiResponse.success("YouTube API limit fetched", {
+            youtubeLimit: config.data.apiLimitDay.youtube,
+        });
+    }
+
+    @Get("api/usage")
+    @Security(SecurityRole.Admin)
+    @Example<ApiResponseFormat>({
+        "success": true,
+        "message": "YouTube API usage fetched",
+        "data": [
+            {
+                "id": "cmqzdv4130000xkkli9ocs5y6",
+                "provider": "youtube",
+                "startDate": "2026-06-29T00:00:00.000Z",
+                "endDate": "2026-06-29T23:59:59.999Z",
+                "used": 101,
+                "lastUsed": "2026-06-29T15:39:13.575Z"
+            }
+        ],
+        "timestamp": "2026-06-29T16:32:42.506Z"
+    })
+    @Response<ApiResponseFormat>(401, "Unauthorized")
+    public async getApiUsage(): Promise<ApiResponseFormat> {
+        const apiUsage = await AdminService.getYoutubeApiUsage();
+        return ApiResponse.success("YouTube API usage fetched", apiUsage);
+    }
+
+
     /** Update the maximum number of cache lines for the search and metadata caches. */
     @Patch("cache/size")
     @Security(SecurityRole.Admin)
     @Example<ApiResponseFormat>({
-        success: true,
-        message: "Cache sizes updated",
-        data: {
-            searchCacheLineSize: 100,
-            metadataCacheLineSize: 100,
+        "success": true,
+        "message": "Cache sizes updated",
+        "data": {
+            "searchCacheLineSize": 200,
+            "metadataCacheLineSize": 500
         },
-        timestamp: "2026-06-17T18:30:00.000Z",
+        "timestamp": "2026-06-29T16:24:06.726Z"
     })
     @Response<ApiResponseFormat>(400, "Invalid input")
     @Response<ApiResponseFormat>(401, "Unauthorized")
@@ -183,9 +254,9 @@ export class AdminController extends Controller {
     @Delete("cache/clear")
     @Security(SecurityRole.Admin)
     @Example<ApiResponseFormat>({
-        success: true,
-        message: "Cache cleared",
-        timestamp: "2026-06-17T18:30:00.000Z",
+        "success": true,
+        "message": "Cache cleared",
+        "timestamp": "2026-06-29T16:24:30.768Z"
     })
     @Response<ApiResponseFormat>(401, "Unauthorized")
     public async clearCache(): Promise<ApiResponseFormat> {
@@ -197,22 +268,22 @@ export class AdminController extends Controller {
     @Get("stats")
     @Security(SecurityRole.Admin)
     @Example<ApiResponseFormat>({
-        success: true,
-        message: "Admin stats fetched",
-        data: {
-            groups: 4,
-            users: 18,
-            apiVersion: "1.0.0",
-            uptime: 86400,
-            memory: {
-                usedMB: 512,
-                freeMB: 1536,
-                totalMB: 2048,
-                usagePercent: 25,
+        "success": true,
+        "message": "Admin stats fetched",
+        "data": {
+            "groups": 2,
+            "users": 3,
+            "apiVersion": "v1",
+            "uptime": 22045,
+            "memory": {
+                "usedMB": 18570,
+                "freeMB": 13555,
+                "totalMB": 32125,
+                "usagePercent": 57.81
             },
-            cpuUsage: "12.34%",
+            "cpuUsage": "9.36%"
         },
-        timestamp: "2026-06-17T18:30:00.000Z",
+        "timestamp": "2026-06-29T16:25:03.147Z"
     })
     @Response<ApiResponseFormat>(401, "Unauthorized")
     public async getStats(): Promise<ApiResponseFormat> {

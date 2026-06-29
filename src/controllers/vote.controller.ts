@@ -22,27 +22,27 @@ export class VoteController extends Controller {
     @Get("{voteId}")
     @Security(SecurityRole.UserGroup)
     @Example<ApiResponseFormat>({
-        success: true,
-        message: "Vote retrieved successfully",
-        data: {
-            id: 4,
-            title: "Skip this song?",
-            url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-            userId: 2,
-            groupId: "X7K2QP",
-            endDate: "2026-06-17T18:35:00.000Z",
-            upVote: 3,
-            downVote: 1,
+        "success": true,
+        "message": "Vote retrieved successfully",
+        "data": {
+            "id": 1,
+            "title": "Skip this song?",
+            "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            "userId": 4,
+            "downVote": 1,
+            "upVote": 4,
+            "endDate": "2026-06-29T16:01:47.879Z",
+            "groupId": "1ARM6G"
         },
-        timestamp: "2026-06-17T18:30:00.000Z",
+        "timestamp": "2026-06-29T16:11:36.813Z"
     })
     @Response<ApiResponseFormat>(401, "Unauthorized")
     public async get(
         @Path() voteId: number,
-        @Request() req: AuthenticatedAdminRequest
+        @Request() req: AuthenticatedRequest
     ): Promise<ApiResponseFormat> {
         const user = req.user;
-        const groupId = user.managedGroup.code;
+        const groupId = user.groupId;
 
         const vote = await VoteService.get(groupId, voteId);
         return ApiResponse.success("Vote retrieved successfully", vote);
@@ -52,19 +52,19 @@ export class VoteController extends Controller {
     @Post("create")
     @Security(SecurityRole.AdminGroup)
     @Example<ApiResponseFormat>({
-        success: true,
-        message: "Vote created successfully",
-        data: {
-            id: 5,
-            title: "Skip this song?",
-            url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-            userId: 1,
-            groupId: "X7K2QP",
-            endDate: "2026-06-17T18:33:00.000Z",
-            upVote: 0,
-            downVote: 0,
+        "success": true,
+        "message": "Vote created successfully",
+        "data": {
+            "id": 1,
+            "title": "Skip this song?",
+            "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            "userId": 2,
+            "downVote": 0,
+            "upVote": 0,
+            "endDate": "2026-06-29T16:01:47.879Z",
+            "groupId": "1ARM6G"
         },
-        timestamp: "2026-06-17T18:30:00.000Z",
+        "timestamp": "2026-06-29T16:01:17.899Z"
     })
     @Response<ApiResponseFormat>(401, "Unauthorized")
     public async create(
@@ -83,19 +83,19 @@ export class VoteController extends Controller {
     @Delete("{voteId}")
     @Security(SecurityRole.AdminGroup)
     @Example<ApiResponseFormat>({
-        success: true,
-        message: "Vote deleted successfully",
-        data: {
-            id: 5,
-            title: "Skip this song?",
-            url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-            userId: 1,
-            groupId: "X7K2QP",
-            endDate: "2026-06-17T18:33:00.000Z",
-            upVote: 4,
-            downVote: 1,
+        "success": true,
+        "message": "Vote deleted successfully",
+        "data": {
+            "id": 1,
+            "title": "Skip this song?",
+            "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            "userId": 4,
+            "downVote": 0,
+            "upVote": 1,
+            "endDate": "2026-06-29T16:01:47.879Z",
+            "groupId": "1ARM6G"
         },
-        timestamp: "2026-06-17T18:30:00.000Z",
+        "timestamp": "2026-06-29T16:12:34.475Z"
     })
     @Response<ApiResponseFormat>(401, "Unauthorized")
     public async delete(
@@ -113,19 +113,19 @@ export class VoteController extends Controller {
     @Post("{voteId}/vote")
     @Security(SecurityRole.UserGroup)
     @Example<ApiResponseFormat>({
-        success: true,
-        message: "Vote cast successfully",
-        data: {
-            id: 5,
-            title: "Skip this song?",
-            url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-            userId: 3,
-            groupId: "X7K2QP",
-            endDate: "2026-06-17T18:33:00.000Z",
-            upVote: 5,
-            downVote: 1,
+        "success": true,
+        "message": "Vote cast successfully",
+        "data": {
+            "id": 1,
+            "title": "Skip this song?",
+            "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            "userId": 4,
+            "downVote": 0,
+            "upVote": 1,
+            "endDate": "2026-06-29T16:01:47.879Z",
+            "groupId": "1ARM6G"
         },
-        timestamp: "2026-06-17T18:30:00.000Z",
+        "timestamp": "2026-06-29T16:01:48.701Z"
     })
     @Response<ApiResponseFormat>(401, "Unauthorized")
     public async vote(

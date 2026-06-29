@@ -439,7 +439,7 @@ export async function playlistYoutube(playlistId: string) {
 
     const params = new URLSearchParams({
         key: API_KEY!,
-        part: "contentDetails",
+        part: "snippet,contentDetails",
         playlistId: playlistId,
         maxResults: "50",
     });
@@ -473,4 +473,15 @@ export async function playlistYoutube(playlistId: string) {
     });
 
     return validatedItems;
+}
+
+export async function isAlreadyInQueue(groupId: string, providerKey: string): Promise<boolean> {
+    const existing = await prisma.music.findFirst({
+        where: {
+            groupId,
+            providerKey,
+        },
+    });
+
+    return existing !== null;
 }
