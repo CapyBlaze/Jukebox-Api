@@ -816,15 +816,15 @@
                 document.getElementById("volume-high").style.display = "none";
 
                 if (muted) {
-                    document.getElementById("volume-mute").style.display = "block";
+                    document.getElementById("volume-mute").style.display = "inline-block";
                 } else if (vol === 0) {
-                    document.getElementById("volume-off").style.display = "block";
+                    document.getElementById("volume-off").style.display = "inline-block";
                 } else if (vol < 33) {
-                    document.getElementById("volume-low").style.display = "block";
+                    document.getElementById("volume-low").style.display = "inline-block";
                 } else if (vol < 67) {
-                    document.getElementById("volume-medium").style.display = "block";
+                    document.getElementById("volume-medium").style.display = "inline-block";
                 } else {
-                    document.getElementById("volume-high").style.display = "block";
+                    document.getElementById("volume-high").style.display = "inline-block";
                 }
             }
 
@@ -832,21 +832,31 @@
                 const vol = Number(e.target.value);
                 player.setVolume(vol);
 
-                if (player.isMuted() && vol > 0) {
+                let isNowMuted = player.isMuted();
+
+                if (isNowMuted && vol > 0) {
                     player.unMute();
+                    isNowMuted = false;
+                } else if (!isNowMuted && vol === 0) {
+                    player.mute();
+                    isNowMuted = true;
                 }
 
-                volumeIconUpdate(vol, player.isMuted());
+                volumeIconUpdate(vol, isNowMuted);
             });
 
             muteButton.addEventListener("click", () => {
+                let isNowMuted;
+
                 if (player.isMuted()) {
                     player.unMute();
+                    isNowMuted = false;
                 } else {
                     player.mute();
+                    isNowMuted = true;
                 }
 
-                volumeIconUpdate(Number(volumeSlider.value), player.isMuted());
+                volumeIconUpdate(Number(volumeSlider.value), isNowMuted);
             });
         </script>
         <script>
