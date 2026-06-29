@@ -1,6 +1,7 @@
 import type { Music } from "@prisma/client";
 
 import { prisma } from "../prisma.js";
+import * as SearchService from "./search.service.js";
 
 export async function getQueue(groupId: string): Promise<Music[]> {
     const queue = await prisma.music.findMany({
@@ -160,4 +161,40 @@ export async function skip(groupId: string): Promise<Music | null> {
     });
 
     return result;
+}
+
+export async function addPlaylistToQueue(
+    groupId: string,
+    userId: number,
+    provider: string,
+    playlistKey: string
+): Promise<Music[]> {
+    const playlistItems = await SearchService.playlistYoutube(playlistKey);
+
+    const videos = playlistItems
+        .map((item) => ({
+            videoId: item.contentDetails?.videoId,
+            title: item.snippet?.title ?? "Unknown Title",
+        }))
+        .filter((video): video is { videoId: string; title: string } => Boolean(video.videoId));
+
+    const videoIds = videos.map((v) => v.videoId);
+    const durations = await SearchService.durationYoutube(videoIds);
+
+    const resultsAdded = await prisma.$transaction(
+        videos.map((video, i) =>
+            prisma.music.create({
+                data: {
+                    groupId,
+                    title: video.title,
+                    provider,
+                    providerKey: video.videoId,
+                    durationSec: durations[i],
+                    userId,
+                },
+            })
+        )
+    );
+
+    return resultsAdded;
 }

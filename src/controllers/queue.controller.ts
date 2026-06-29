@@ -12,6 +12,11 @@ interface AddToQueueBody {
     providerKey: string;
 }
 
+interface AddPlaylistToQueueBody {
+    provider: string;
+    playlistKey: string;
+}
+
 @Route("group/queue")
 @Tags("Queue")
 export class QueueController extends Controller {
@@ -80,6 +85,23 @@ export class QueueController extends Controller {
 
         const addedMusic = await QueueService.addToQueue(user.groupId, user.id, title, provider, providerKey, durationSec);
         return ApiResponse.success("Music added to queue", addedMusic);
+    }
+
+    /** Add a playlist to the group's queue. Duration is fetched automatically from YouTube. */
+    @Post("playlist")
+    @Security(SecurityRole.UserGroup)
+    public async addPlaylistToQueue(
+        @Body() body: AddPlaylistToQueueBody,
+        @Request() req: AuthenticatedRequest
+    ): Promise<ApiResponseFormat> {
+        const user = req.user;
+        const { provider, playlistKey } = body;
+    
+        const addedMusics = await QueueService.addPlaylistToQueue(user.groupId, user.id, provider, playlistKey);
+        return ApiResponse.success("Music added to queue", {
+            addedCount: addedMusics.length,
+            playlistItems: addedMusics
+        });
     }
 
     /** Remove a song from the queue by its ID. */
