@@ -15,7 +15,11 @@
         },
         "servers": ["jukebox.capyblaze.hackclub.app"],
         "securityDefinitions": {
-            "playerAuth": {
+            "userGroupAuth": {
+                "type": "http",
+                "scheme": "bearer"
+            },
+            "adminGroupAuth": {
                 "type": "http",
                 "scheme": "bearer"
             },

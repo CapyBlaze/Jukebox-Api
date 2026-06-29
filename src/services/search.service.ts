@@ -95,6 +95,10 @@ export async function searchYouTube(query: string): Promise<YouTubeSearchResult[
         throw new Error("YouTube API usage limit reached for today");
     }
 
+    if (!API_KEY) {
+        throw new Error("YouTube API key is not set");
+    }
+
     const params = new URLSearchParams({
         key: API_KEY!,
         part: "snippet",
@@ -182,6 +186,10 @@ export async function durationYoutube(videoId: string): Promise<number | null> {
 
     if (usage && usage.used >= config.data.apiLimitDay.youtube) {
         throw new Error("YouTube API usage limit reached for today");
+    }
+
+    if (!API_KEY) {
+        throw new Error("YouTube API key is not set");
     }
 
     const params = new URLSearchParams({

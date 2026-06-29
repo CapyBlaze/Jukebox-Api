@@ -194,7 +194,7 @@ export class GroupController extends Controller {
     }
 
     /** Generate a new jukebox stream token, invalidating the previous one. */
-    @Patch("jukebox/rotate")
+    @Patch("jukebox/token/rotate")
     @Security(SecurityRole.AdminGroup)
     @Example<ApiResponseFormat>({
         success: true,
