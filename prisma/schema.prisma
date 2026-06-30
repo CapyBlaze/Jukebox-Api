@@ -16,6 +16,7 @@ model Group {
   isPlaying         Boolean   @default(false)
   currentTrackId    Int?
   playbackStartedAt DateTime?
+  pausedAtSec       Int?      @default(0)
   streamToken       String    @unique @default(uuid())
 
   adminId   Int?   @unique

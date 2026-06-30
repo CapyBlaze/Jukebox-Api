@@ -186,7 +186,7 @@ export class QueueController extends Controller {
         const currentSong = await QueueService.getCurrent(user.groupId);
 
         if (currentSong === null) {
-            return ApiResponse.success("No song is currently playing");
+            return ApiResponse.success("No song is currently playing", null);
         }
 
         return ApiResponse.success("Current song information", currentSong);
