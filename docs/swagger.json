@@ -1774,6 +1774,137 @@
 				}
 			}
 		},
+		"/admin/group/{groupId}": {
+			"delete": {
+				"operationId": "DeleteGroup",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "Group deleted",
+											"timestamp": "2026-06-29T16:18:49.137Z"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Group not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"description": "Delete a group.",
+				"tags": [
+					"Admin"
+				],
+				"security": [
+					{
+						"adminAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "groupId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/admin/user/{userId}": {
+			"delete": {
+				"operationId": "DeleteUser",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "User deleted",
+											"timestamp": "2026-06-29T16:18:49.137Z"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "User not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"description": "Delete a user.",
+				"tags": [
+					"Admin"
+				],
+				"security": [
+					{
+						"adminAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "userId",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
 		"/admin/ip/ban": {
 			"post": {
 				"operationId": "BanIP",
@@ -1965,6 +2096,53 @@
 			}
 		},
 		"/admin/api/limit": {
+			"get": {
+				"operationId": "GetApiLimit",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "YouTube API limit fetched",
+											"data": {
+												"youtubeLimit": 10000
+											},
+											"timestamp": "2026-06-29T16:32:05.221Z"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"description": "Get the current daily YouTube API call limit.",
+				"tags": [
+					"Admin"
+				],
+				"security": [
+					{
+						"adminAuth": []
+					}
+				],
+				"parameters": []
+			},
 			"patch": {
 				"operationId": "UpdateApiLimit",
 				"responses": {
@@ -2031,52 +2209,6 @@
 						}
 					}
 				}
-			},
-			"get": {
-				"operationId": "GetApiLimit",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ApiResponseFormat"
-								},
-								"examples": {
-									"Example 1": {
-										"value": {
-											"success": true,
-											"message": "YouTube API limit fetched",
-											"data": {
-												"youtubeLimit": 10000
-											},
-											"timestamp": "2026-06-29T16:32:05.221Z"
-										}
-									}
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ApiResponseFormat"
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"Admin"
-				],
-				"security": [
-					{
-						"adminAuth": []
-					}
-				],
-				"parameters": []
 			}
 		},
 		"/admin/api/usage": {
@@ -2123,6 +2255,7 @@
 						}
 					}
 				},
+				"description": "Get the current YouTube API usage for the day.",
 				"tags": [
 					"Admin"
 				],
@@ -2135,6 +2268,54 @@
 			}
 		},
 		"/admin/cache/size": {
+			"get": {
+				"operationId": "GetCacheSize",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "Cache sizes fetched",
+											"data": {
+												"searchCacheLineSize": 100,
+												"metadataCacheLineSize": 100
+											},
+											"timestamp": "2026-06-29T23:09:59.432Z"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"description": "Get the current maximum cache line sizes for search and metadata caches.",
+				"tags": [
+					"Admin"
+				],
+				"security": [
+					{
+						"adminAuth": []
+					}
+				],
+				"parameters": []
+			},
 			"patch": {
 				"operationId": "UpdateCacheSize",
 				"responses": {
@@ -2239,6 +2420,52 @@
 					}
 				},
 				"description": "Clear all server-side caches (search and metadata).",
+				"tags": [
+					"Admin"
+				],
+				"security": [
+					{
+						"adminAuth": []
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/admin/cache/cleanup": {
+			"post": {
+				"operationId": "CleanupCache",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": true,
+											"message": "Cache cleanup completed",
+											"timestamp": "2026-06-29T23:10:45.888Z"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponseFormat"
+								}
+							}
+						}
+					}
+				},
+				"description": "Cleanup the search and metadata caches.",
 				"tags": [
 					"Admin"
 				],

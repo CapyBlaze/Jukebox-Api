@@ -1,9 +1,10 @@
 import os from "os";
 import systeminformation from "systeminformation";
-import { Body, Controller, Delete, Example, Get, Patch, Post, Response, Route, Security, Tags } from "tsoa";
+import { Body, Controller, Delete, Example, Get, Patch, Path, Post, Response, Route, Security, Tags } from "tsoa";
 
 import { SecurityRole } from "../middlewares/auth.middleware.js";
 import * as AdminService from "../services/admin.service.js";
+import * as CacheService from "../services/cache.service.js";
 import { ApiResponse, type ApiResponseFormat } from "../utils/apiResponse.js";
 import { config } from "../config/config.js";
 
@@ -55,6 +56,48 @@ export class AdminController extends Controller {
             token: token,
             name: username,
         });
+    }
+
+    /** Delete a group. */
+    @Delete("group/{groupId}")
+    @Security(SecurityRole.Admin)
+    @Example<ApiResponseFormat>({
+        "success": true,
+        "message": "Group deleted",
+        "timestamp": "2026-06-30T09:35:59.762Z"
+    })
+    @Response<ApiResponseFormat>(401, "Unauthorized")
+    @Response<ApiResponseFormat>(404, "Group not found")
+    public async deleteGroup(@Path() groupId: string): Promise<ApiResponseFormat> {
+        const groupDeleted = await AdminService.deleteGroup(groupId);
+
+        if (!groupDeleted) {
+            this.setStatus(404);
+            return ApiResponse.error("Group not found", `No group found with ID: ${groupId}`);
+        }
+
+        return ApiResponse.success("Group deleted");
+    }
+
+    /** Delete a user. */
+    @Delete("user/{userId}")
+    @Security(SecurityRole.Admin)
+    @Example<ApiResponseFormat>({
+        "success": true,
+        "message": "User deleted",
+        "timestamp": "2026-06-30T09:35:09.457Z"
+    })
+    @Response<ApiResponseFormat>(401, "Unauthorized")
+    @Response<ApiResponseFormat>(404, "User not found")
+    public async deleteUser(@Path() userId: number): Promise<ApiResponseFormat> {
+        const userDeleted = await AdminService.deleteUser(userId);
+
+        if (!userDeleted) {
+            this.setStatus(404);
+            return ApiResponse.error("User not found", `No user found with ID: ${userId}`);
+        }
+
+        return ApiResponse.success("User deleted");
     }
 
     /** Ban an IP address from accessing the API. */
@@ -138,6 +181,48 @@ export class AdminController extends Controller {
 
         return ApiResponse.success("Banned IPs fetched", formattedBannedIps);
     }
+    
+    /** Get the current daily YouTube API call limit. */
+    @Get("api/limit")
+    @Security(SecurityRole.Admin)
+    @Example<ApiResponseFormat>({
+        "success": true,
+        "message": "YouTube API limit fetched",
+        "data": {
+            "youtubeLimit": 10000
+        },
+        "timestamp": "2026-06-29T16:32:05.221Z"
+    })
+    @Response<ApiResponseFormat>(401, "Unauthorized")
+    public async getApiLimit(): Promise<ApiResponseFormat> {
+        return ApiResponse.success("YouTube API limit fetched", {
+            youtubeLimit: config.data.apiLimitDay.youtube,
+        });
+    }
+
+    /** Get the current YouTube API usage for the day. */
+    @Get("api/usage")
+    @Security(SecurityRole.Admin)
+    @Example<ApiResponseFormat>({
+        "success": true,
+        "message": "YouTube API usage fetched",
+        "data": [
+            {
+                "id": "cmqzdv4130000xkkli9ocs5y6",
+                "provider": "youtube",
+                "startDate": "2026-06-29T00:00:00.000Z",
+                "endDate": "2026-06-29T23:59:59.999Z",
+                "used": 101,
+                "lastUsed": "2026-06-29T15:39:13.575Z"
+            }
+        ],
+        "timestamp": "2026-06-29T16:32:42.506Z"
+    })
+    @Response<ApiResponseFormat>(401, "Unauthorized")
+    public async getApiUsage(): Promise<ApiResponseFormat> {
+        const apiUsage = await AdminService.getYoutubeApiUsage();
+        return ApiResponse.success("YouTube API usage fetched", apiUsage);
+    }
 
     /** Update the daily YouTube API call limit. */
     @Patch("api/limit")
@@ -168,46 +253,25 @@ export class AdminController extends Controller {
         });
     }
 
-    @Get("api/limit")
+    /** Get the current maximum cache line sizes for search and metadata caches. */
+    @Get("cache/size")
     @Security(SecurityRole.Admin)
     @Example<ApiResponseFormat>({
         "success": true,
-        "message": "YouTube API limit fetched",
+        "message": "Cache sizes fetched",
         "data": {
-            "youtubeLimit": 10000
+            "searchCacheLineSize": 100,
+            "metadataCacheLineSize": 100
         },
-        "timestamp": "2026-06-29T16:32:05.221Z"
+        "timestamp": "2026-06-29T23:09:59.432Z"
     })
     @Response<ApiResponseFormat>(401, "Unauthorized")
-    public async getApiLimit(): Promise<ApiResponseFormat> {
-        return ApiResponse.success("YouTube API limit fetched", {
-            youtubeLimit: config.data.apiLimitDay.youtube,
+    public async getCacheSize(): Promise<ApiResponseFormat> {
+        return ApiResponse.success("Cache sizes fetched", {
+            searchCacheLineSize: config.data.maxCacheLine.search,
+            metadataCacheLineSize: config.data.maxCacheLine.metadata,
         });
     }
-
-    @Get("api/usage")
-    @Security(SecurityRole.Admin)
-    @Example<ApiResponseFormat>({
-        "success": true,
-        "message": "YouTube API usage fetched",
-        "data": [
-            {
-                "id": "cmqzdv4130000xkkli9ocs5y6",
-                "provider": "youtube",
-                "startDate": "2026-06-29T00:00:00.000Z",
-                "endDate": "2026-06-29T23:59:59.999Z",
-                "used": 101,
-                "lastUsed": "2026-06-29T15:39:13.575Z"
-            }
-        ],
-        "timestamp": "2026-06-29T16:32:42.506Z"
-    })
-    @Response<ApiResponseFormat>(401, "Unauthorized")
-    public async getApiUsage(): Promise<ApiResponseFormat> {
-        const apiUsage = await AdminService.getYoutubeApiUsage();
-        return ApiResponse.success("YouTube API usage fetched", apiUsage);
-    }
-
 
     /** Update the maximum number of cache lines for the search and metadata caches. */
     @Patch("cache/size")
@@ -262,6 +326,21 @@ export class AdminController extends Controller {
     public async clearCache(): Promise<ApiResponseFormat> {
         await AdminService.clearCache();
         return ApiResponse.success("Cache cleared");
+    }
+
+    /** Cleanup the search and metadata caches. */
+    @Post("cache/cleanup")
+    @Security(SecurityRole.Admin)
+    @Example<ApiResponseFormat>({
+        "success": true,
+        "message": "Cache cleanup completed",
+        "timestamp": "2026-06-29T23:10:45.888Z"
+    })
+    @Response<ApiResponseFormat>(401, "Unauthorized")
+    public async cleanupCache(): Promise<ApiResponseFormat> {
+        await CacheService.cleanupSearchCache();
+        await CacheService.cleanupMetadataCache();
+        return ApiResponse.success("Cache cleanup completed");
     }
 
     /** Get global game totals and host resource statistics for the admin dashboard. */

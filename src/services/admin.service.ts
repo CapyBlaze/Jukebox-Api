@@ -1,4 +1,4 @@
-import type { ApiUsage, IpBan } from "@prisma/client";
+import type { ApiUsage, Group, IpBan, User } from "@prisma/client";
 
 import { HttpError } from "../middlewares/error.middleware.js";
 import { prisma } from "../prisma.js";
@@ -29,6 +29,77 @@ export async function login(username: string, password: string): Promise<token> 
     });
 
     return token;
+}
+
+export async function deleteGroup(groupId: string): Promise<Group | null> {
+    const groupExists = await prisma.group.findUnique({
+        where: {
+            code: groupId,
+        },
+    });
+
+    if (!groupExists) return null;
+
+    return await prisma.$transaction(async (tx) => {
+        await tx.vote.deleteMany({
+            where: {
+                groupId: groupId,
+            },
+        });
+
+        await tx.music.deleteMany({
+            where: {
+                groupId: groupId,
+            },
+        });
+
+        await tx.group.update({
+            where: { code: groupId },
+            data: { adminId: null },
+        });
+
+        await tx.user.deleteMany({
+            where: {
+                groupId: groupId,
+            },
+        });
+
+        return await tx.group.delete({
+            where: {
+                code: groupId,
+            },
+        });
+    });
+}
+
+export async function deleteUser(userId: number): Promise<User | null> {
+    const userExists = await prisma.user.findUnique({
+        where: {
+            id: userId,
+        },
+    });
+
+    if (!userExists) return null;
+
+    return await prisma.$transaction(async (tx) => {
+        await tx.vote.deleteMany({
+            where: {
+                userId: userId,
+            },
+        });
+
+        await tx.music.deleteMany({
+            where: {
+                userId: userId,
+            },
+        });
+
+        return await tx.user.delete({
+            where: {
+                id: userId,
+            },
+        });
+    });
 }
 
 export async function ipBanned(ipAddress: string): Promise<IpBan> {

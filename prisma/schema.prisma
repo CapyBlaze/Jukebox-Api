@@ -19,7 +19,7 @@ model Group {
   streamToken       String    @unique @default(uuid())
 
   adminId   Int?   @unique
-  adminUser User?  @relation("GroupAdmin", fields: [adminId], references: [id], onDelete: Cascade)
+  adminUser User?  @relation("GroupAdmin", fields: [adminId], references: [id], onDelete: SetNull)
   members   User[] @relation("GroupMembers")
 }
 
@@ -33,7 +33,7 @@ model Vote {
   endDate  DateTime
 
   groupId String
-  group   Group? @relation(fields: [groupId], references: [code])
+  group   Group? @relation(fields: [groupId], references: [code], onDelete: Cascade)
 }
 
 model Music {
