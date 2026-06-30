@@ -794,14 +794,28 @@
         </script>
         <script>
             async function checkAdBlock() {
-                const adUrl = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js";
+                const bait = document.createElement("div");
+                bait.className = "adsbox ad-banner ads ad-placement";
+                bait.style.cssText = "position:absolute; left:-9999px; width:1px; height:1px;";
+                bait.innerHTML = "&nbsp;";
+                document.body.appendChild(bait);
 
-                try {
-                    const response = await fetch(adUrl, { mode: "no-cors" });
-                } catch (e) {
+                await new Promise((resolve) => setTimeout(resolve, 100));
+
+                const isBlocked =
+                    bait.offsetParent === null ||
+                    bait.offsetHeight === 0 ||
+                    bait.offsetWidth === 0 ||
+                    getComputedStyle(bait).display === "none" ||
+                    getComputedStyle(bait).visibility === "hidden";
+
+                bait.remove();
+
+                if (isBlocked) {
                     document.getElementById("adblock-warning-overlay").style.display = "block";
                 }
             }
+
             window.addEventListener("load", checkAdBlock);
         </script>
         <script>
