@@ -286,6 +286,216 @@
           ]
         },
         {
+          "name": "Delete group",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{platformAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/group/{{groupId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "group",
+                "{{groupId}}"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/group/{{groupId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "group",
+                    "{{groupId}}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "RateLimit-Policy",
+                  "value": "200;w=900"
+                },
+                {
+                  "key": "RateLimit",
+                  "value": "limit=200, remaining=195, reset=836"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "81"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"51-9+Wpz25ZMysJ9RSWOE4O9bGpPRE\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Tue, 30 Jun 2026 09:35:59 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Group deleted\",\n    \"timestamp\": \"2026-06-30T09:35:59.762Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete user",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{platformAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ipAddress\": \"{{ipAddress}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/user/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "user",
+                "{{userId}}"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"ipAddress\": \"{{ipAddress}}\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/user/{{userId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "user",
+                    "{{userId}}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "RateLimit-Policy",
+                  "value": "200;w=900"
+                },
+                {
+                  "key": "RateLimit",
+                  "value": "limit=200, remaining=197, reset=886"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "80"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"50-Ju4jIb0vnamuL8WAREICye1XBrQ\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Tue, 30 Jun 2026 09:35:09 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"User deleted\",\n    \"timestamp\": \"2026-06-30T09:35:09.457Z\"\n}"
+            }
+          ]
+        },
+        {
           "name": "Ban IP",
           "request": {
             "auth": {
@@ -611,115 +821,6 @@
           ]
         },
         {
-          "name": "Update API Limit",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{platformAdminToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"youtubeLimit\": 5000\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/admin/api/limit",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "api",
-                "limit"
-              ]
-            }
-          },
-          "response": [
-            {
-              "name": "200",
-              "originalRequest": {
-                "method": "PATCH",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"youtubeLimit\": 5000\n}"
-                },
-                "url": {
-                  "raw": "{{baseUrl}}/admin/api/limit",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "admin",
-                    "api",
-                    "limit"
-                  ]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_postman_previewlanguage": null,
-              "header": [
-                {
-                  "key": "X-Powered-By",
-                  "value": "Express"
-                },
-                {
-                  "key": "RateLimit-Policy",
-                  "value": "200;w=900"
-                },
-                {
-                  "key": "RateLimit",
-                  "value": "limit=200, remaining=198, reset=898"
-                },
-                {
-                  "key": "Content-Type",
-                  "value": "application/json; charset=utf-8"
-                },
-                {
-                  "key": "Content-Length",
-                  "value": "122"
-                },
-                {
-                  "key": "ETag",
-                  "value": "W/\"7a-TdWsXuNVPhm1KrwjYcMaqgWM07M\""
-                },
-                {
-                  "key": "Date",
-                  "value": "Mon, 29 Jun 2026 16:23:09 GMT"
-                },
-                {
-                  "key": "Connection",
-                  "value": "keep-alive"
-                },
-                {
-                  "key": "Keep-Alive",
-                  "value": "timeout=5"
-                }
-              ],
-              "cookie": [],
-              "body": "{\n    \"success\": true,\n    \"message\": \"YouTube API limit updated\",\n    \"data\": {\n        \"youtubeLimit\": 5000\n    },\n    \"timestamp\": \"2026-06-29T16:23:09.664Z\"\n}"
-            }
-          ]
-        },
-        {
           "name": "Get Api Limit",
           "request": {
             "auth": {
@@ -910,6 +1011,206 @@
                 }
               ],
               "body": "{\n    \"success\": true,\n    \"message\": \"YouTube API usage fetched\",\n    \"data\": [\n        {\n            \"id\": \"cmqzdv4130000xkkli9ocs5y6\",\n            \"provider\": \"youtube\",\n            \"startDate\": \"2026-06-29T00:00:00.000Z\",\n            \"endDate\": \"2026-06-29T23:59:59.999Z\",\n            \"used\": 101,\n            \"lastUsed\": \"2026-06-29T15:39:13.575Z\"\n        }\n    ],\n    \"timestamp\": \"2026-06-29T16:32:42.506Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update API Limit",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{platformAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"youtubeLimit\": 5000\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/api/limit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "api",
+                "limit"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"youtubeLimit\": 5000\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/limit",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "api",
+                    "limit"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "RateLimit-Policy",
+                  "value": "200;w=900"
+                },
+                {
+                  "key": "RateLimit",
+                  "value": "limit=200, remaining=198, reset=898"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "122"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"7a-TdWsXuNVPhm1KrwjYcMaqgWM07M\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 29 Jun 2026 16:23:09 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"YouTube API limit updated\",\n    \"data\": {\n        \"youtubeLimit\": 5000\n    },\n    \"timestamp\": \"2026-06-29T16:23:09.664Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Cache Size",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{platformAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/cache/size",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "cache",
+                "size"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/cache/size",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "cache",
+                    "size"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "RateLimit-Policy",
+                  "value": "200;w=900"
+                },
+                {
+                  "key": "RateLimit",
+                  "value": "limit=200, remaining=197, reset=892"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "150"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"96-wQsB/mWS2857rPgvnGh+HGgRedo\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 29 Jun 2026 23:09:59 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Cache sizes fetched\",\n    \"data\": {\n        \"searchCacheLineSize\": 100,\n        \"metadataCacheLineSize\": 100\n    },\n    \"timestamp\": \"2026-06-29T23:09:59.432Z\"\n}"
             }
           ]
         },
@@ -1110,6 +1411,97 @@
               ],
               "cookie": [],
               "body": "{\n    \"success\": true,\n    \"message\": \"Cache cleared\",\n    \"timestamp\": \"2026-06-29T16:24:30.768Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Cleanup Cache",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{platformAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/cache/cleanup",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "cache",
+                "cleanup"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/cache/cleanup",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "cache",
+                    "cleanup"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "RateLimit-Policy",
+                  "value": "200;w=900"
+                },
+                {
+                  "key": "RateLimit",
+                  "value": "limit=200, remaining=197, reset=893"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "91"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"5b-LWTj1i9aBMX3tP+aI8xEkPBAlL4\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 29 Jun 2026 23:10:45 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Cache cleanup completed\",\n    \"timestamp\": \"2026-06-29T23:10:45.888Z\"\n}"
             }
           ]
         },
@@ -3766,6 +4158,10 @@
     },
     {
       "key": "groupUserToken",
+      "value": ""
+    },
+    {
+      "key": "userId",
       "value": ""
     },
     {
