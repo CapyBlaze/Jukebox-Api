@@ -1,6 +1,6 @@
 # Jukebox API
 
-A collaborative jukebox API that allows users to create user groups, set up music playlists and stream this music live to any device via a web browser.
+A simple jukebox API where users can create groups, add music to a shared queue and listen together in a web browser.
 
 - [Swagger Documentation](https://jukebox.capyblaze.hackclub.app/docs)
 - [Postman Collection](https://raw.githubusercontent.com/CapyBlaze/Jukebox-Api/refs/heads/main/docs/postman/Jukebox%20API.postman_collection.json)
@@ -41,7 +41,7 @@ The API returns a unique token:
 }
 ```
 
-Store this token carefully. It identifies you within the group and will be required for all future requests.
+Save this token. You will need it for the next requests.
 
 Use it in the `Authorization` header:
 
@@ -103,7 +103,7 @@ POST /group/vote/create
 }
 ```
 
-Other members can then cast their vote:
+Other users can vote.
 
 ```http
 POST /group/vote/{voteId}/vote
@@ -114,7 +114,7 @@ POST /group/vote/{voteId}/vote
 
 ### 6. Stream the Jukebox
 
-Retrieve the group's stream token:
+Get the stream token.
 
 ```http
 GET /group/jukebox/token
@@ -126,7 +126,7 @@ Use it to access the live audio player, no authentication required:
 GET /jukebox/{streamToken}
 ```
 
-If the stream token is ever compromised, the admin can rotate it:
+If needed, the admin can generate a new stream token.
 
 ```http
 PATCH /group/jukebox/token/rotate
@@ -134,7 +134,7 @@ PATCH /group/jukebox/token/rotate
 
 ### 7. Other Routes
 
-To see the rest of the available routes, please refer to the [documentation](https://jukebox.capyblaze.hackclub.app/docs/)
+You can find all other endpoints in the [Swagger documentation](https://jukebox.capyblaze.hackclub.app/docs/).
 
 ## Environment Variables
 

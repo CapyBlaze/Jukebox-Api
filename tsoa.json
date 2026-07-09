@@ -7,7 +7,7 @@
         "specVersion": 3,
         "name": "Jukebox API",
         "title": "Jukebox API",
-        "description": "Create a group with friends, add your music, vote in real time to choose the next song, and listen to it together!",
+        "description": "Create a group with your friends, search songs on YouTube, vote for the next track and listen together.",
         "version": "1.0.0",
         "contact": {
             "name": "CapyBlaze",
